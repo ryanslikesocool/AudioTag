@@ -1,13 +1,13 @@
+// Developed with love by Ryan Boyer http://ryanjboyer.com <3
+
 using UnityEngine;
 #if ODIN_INSPECTOR_3
 using Sirenix.OdinInspector;
 #endif
 
-namespace AudioTag
-{
+namespace AudioTag {
     [RequireComponent(typeof(AudioSource))]
-    public class AudioEffect : MonoBehaviour
-    {
+    public class Effect : MonoBehaviour {
 #if ODIN_INSPECTOR_3
         [BoxGroup("Info"), SerializeField] private new string tag = string.Empty;
         [BoxGroup("Info"), ShowInInspector, ReadOnly] public int ID { get; protected set; }
@@ -36,29 +36,25 @@ namespace AudioTag
         [SerializeField] protected Vector2 pitchRange = Vector2.one;
 #endif
 
-        public AudioEffect Init()
-        {
+        internal Effect Init() {
             ID = tag.GetTagID();
             return this;
         }
 
-        public AudioEffect Play()
-        {
-            if (clips.Length > 1 && randomClip)
-            {
+        /// <summary>
+        /// Plays the audio clip with the defined settings.
+        /// </summary>
+        public Effect Play() {
+            if (clips.Length > 1 && randomClip) {
                 clipIndex = UnityEngine.Random.Range(0, clips.Length);
             }
-            if (randomPitch)
-            {
+            if (randomPitch) {
                 source.pitch = UnityEngine.Random.Range(pitchRange.x, pitchRange.y);
             }
 
-            if (isVirtual)
-            {
+            if (isVirtual) {
                 source.PlayOneShot(clips[clipIndex]);
-            }
-            else
-            {
+            } else {
                 source.clip = clips[clipIndex];
                 source.Play();
             }
@@ -66,21 +62,35 @@ namespace AudioTag
             return this;
         }
 
-        public AudioEffect SetClipIndex(int value)
-        {
-            clipIndex = value;
+        /// <summary>
+        /// Sets the clip index of the Effect.
+        /// </summary>
+        /// <param name="value">The index of the clip to play.</param>
+        public Effect SetClipIndex(int value) {
+            if (value < 0 || value >= clips.Length) {
+                clipIndex = 0;
+                Debug.LogWarning($"The desired clip index ({value}) is out of range 0 ..< {clips.Length} on Effect with name \"{gameObject.name}\" and tag \"{tag}\".  The clip index will be set to 0.");
+            } else {
+                clipIndex = value;
+            }
             return this;
         }
 
-        public AudioEffect SetVolume(float value)
-        {
-            source.volume = value;
+        /// <summary>
+        /// Sets the volume of the Effect, clamped between 0 and 1.
+        /// </summary>
+        /// <param name="value">The volume of the Effect.</param>
+        public Effect SetVolume(float value) {
+            source.volume = Mathf.Clamp01(value);
             return this;
         }
 
-        public AudioEffect SetPitch(float value)
-        {
-            source.pitch = value;
+        /// <summary>
+        /// Sets the pitch of the Effect, clamped between -3 and 3.
+        /// </summary>
+        /// <param name="value">The pitch of the Effect.</param>
+        public Effect SetPitch(float value) {
+            source.pitch = Mathf.Clamp(value, -3, 3);
             return this;
         }
     }
