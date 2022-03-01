@@ -1,5 +1,6 @@
 // Developed With Love by Ryan Boyer http://ryanjboyer.com <3
 
+using System;
 using UnityEngine;
 #if ODIN_INSPECTOR_3
 using Sirenix.OdinInspector;
@@ -36,6 +37,11 @@ namespace AudioTag {
         protected Vector2 PitchRange => data.pitchRange;
 #endif
 
+        private bool overrideAny = false;
+        private bool overrideClipIndex = false;
+        private bool overrideVolume = false;
+        private bool overridePitch = false;
+
         internal void Prepare(AudioEffectData data) {
             this.data = data;
             this.clipIndex = 0;
@@ -45,11 +51,22 @@ namespace AudioTag {
         /// Plays the audio clip with the defined settings.
         /// </summary>
         public AudioEffect Play() {
-            if (Clips.Length > 1 && RandomClip) {
-                clipIndex = UnityEngine.Random.Range(0, Clips.Length);
-            }
-            if (RandomPitch) {
-                source.pitch = UnityEngine.Random.Range(PitchRange.x, PitchRange.y);
+            if (!overrideAny) {
+                if (!overrideClipIndex) {
+                    if (Clips.Length > 1 && RandomClip) {
+                        clipIndex = UnityEngine.Random.Range(0, Clips.Length);
+                    }
+                }
+                if (!overridePitch) {
+                    if (RandomPitch) {
+                        source.pitch = UnityEngine.Random.Range(PitchRange.x, PitchRange.y);
+                    } else {
+                        source.pitch = 1;
+                    }
+                }
+                if (!overrideVolume) {
+                    source.volume = data.volume;
+                }
             }
 
             if (IsVirtual) {
@@ -59,11 +76,17 @@ namespace AudioTag {
                 source.Play();
             }
 
+            overrideAny = false;
+            overrideClipIndex = false;
+            overrideVolume = false;
+            overridePitch = false;
+
             return this;
         }
 
         /// <summary>
-        /// Sets the clip index of the AudioEffect.
+        /// Overrides the clip index of the AudioEffect.
+        /// This setting will be in place until the next call to Play().
         /// </summary>
         /// <param name="value">The index of the clip to play.</param>
         public AudioEffect SetClipIndex(int value) {
@@ -73,24 +96,40 @@ namespace AudioTag {
             } else {
                 clipIndex = value;
             }
+            overrideClipIndex = true;
             return this;
         }
 
         /// <summary>
-        /// Sets the volume of the AudioEffect, clamped between 0 and 1.
+        /// Overrides the volume of the AudioEffect, clamped between 0 and 1.
+        /// This setting will be in place until the next call to Play().
         /// </summary>
         /// <param name="value">The volume of the AudioEffect.</param>
         public AudioEffect SetVolume(float value) {
             source.volume = Mathf.Clamp01(value);
+            overrideVolume = true;
             return this;
         }
 
         /// <summary>
-        /// Sets the pitch of the AudioEffect, clamped between -3 and 3.
+        /// Overrides the pitch of the AudioEffect, clamped between -3 and 3.
+        /// This setting will be in place until the next call to Play().
         /// </summary>
         /// <param name="value">The pitch of the AudioEffect.</param>
         public AudioEffect SetPitch(float value) {
             source.pitch = Mathf.Clamp(value, -3, 3);
+            overrideVolume = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Openly modify the AudioSource attached to this AudioEffect.
+        /// Any settings applied will be in place until the next call to Play().
+        /// </summary>
+        /// <param name="value">The pitch of the AudioEffect.</param>
+        public AudioEffect ModifySource(Action<AudioSource> action) {
+            action(source);
+            overrideAny = true;
             return this;
         }
     }

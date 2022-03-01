@@ -1,7 +1,7 @@
 {
   "name": "com.developedwithlove.audiotag",
   "displayName": "AudioTag",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "unity": "2021.1",
   "description": "Tag/ID based audio system for Unity.",
   "documentationUrl": "https://github.com/ryanslikesocool/AudioTag",

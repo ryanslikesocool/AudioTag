@@ -69,6 +69,11 @@ namespace AudioTag {
         /// <param name="id">The ID to look for.</param>
         /// <returns>The AudioEffect with the defined ID, if one was found.</returns>
         public static AudioEffect Peek(int id) {
+            if (id == 0) {
+                Debug.LogError("The AudioEffect ID cannot be 0.");
+                return null;
+            }
+
             if (Shared.effectLink.ContainsKey(id)) {
                 if (Shared.effectLink[id].Count > 0) {
                     return Shared.effectLink[id].First(e => e.Active && (!e.Playing || e.IsVirtual));
@@ -83,5 +88,19 @@ namespace AudioTag {
             Debug.LogWarning($"AudioEffect with ID '{id}' (with possible tag '{Strings.Get(id)}') does not exist.");
             return null;
         }
+
+        /// <summary>
+        /// Play the next available AudioEffect with the defined tag.
+        /// </summary>
+        /// <param name="tag">The tag to look for.</param>
+        /// <returns>The AudioEffect with the defined tag, if one was found.</returns>
+        public static AudioEffect Play(string tag) => Play(Strings.Add(tag));
+
+        /// <summary>
+        /// Play the next available AudioEffect with the defined ID.
+        /// </summary>
+        /// <param name="id">The ID to look for.</param>
+        /// <returns>The AudioEffect with the defined ID, if one was found.</returns>
+        public static AudioEffect Play(int id) => Peek(id).Play();
     }
 }

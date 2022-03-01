@@ -10,9 +10,12 @@ namespace AudioTag {
         public static void Reset() => backing.Clear();
 
         public static int Add(string str) {
-            int id = str.GetHashCode();
-            backing.TryAdd(id, str);
-            return id;
+            if (!string.IsNullOrEmpty(str)) {
+                int id = str.GetHashCode();
+                backing.TryAdd(id, str);
+                return id;
+            }
+            return 0;
         }
 
         public static string Get(int id) {
