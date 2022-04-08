@@ -27,7 +27,7 @@ namespace AudioTag {
         [Tooltip("Should the audio source be marked virtual?")] public bool isVirtual = true;
         [Range(0, 1)] public float volume = 1;
         [Header("Clip")] public AudioClip[] clips = new AudioClip[0];
-        [DisableIf("$randomClip"), HideIf("@clips.Length < 2"), PropertyRange(0, "@clips.Length - 1")] public int clipIndex = 0;
+        public int clipIndex = 0;
         public bool randomClip = false;
         [Header("Pitch")] public bool randomPitch = false;
         [Range(-3, 3)] public float fixedPitch = 1;
