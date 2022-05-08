@@ -12,6 +12,7 @@ namespace AudioTag {
         internal AudioEffectData data = null;
         protected int clipIndex = 0;
         protected string Tag => data.tag;
+        public AudioEffectData Data => data;
 
 #if ODIN_INSPECTOR_3
         [BoxGroup("Info"), ShowInInspector, ReadOnly] public int ID => data == null ? 0 : data.ID;
@@ -69,6 +70,10 @@ namespace AudioTag {
                 }
             }
 
+            if (data.mixerGroup != null) {
+                source.outputAudioMixerGroup = data.mixerGroup;
+            }
+
             if (IsVirtual) {
                 source.PlayOneShot(Clips[clipIndex]);
             } else {
@@ -123,6 +128,16 @@ namespace AudioTag {
         }
 
         /// <summary>
+        /// Sets the world position of the AuidoEffect.
+        /// Useful for spatial audio.
+        /// </summary>
+        /// <param name="value">The world position of the AudioEffect.</param>
+        public AudioEffect SetPosition(Vector3 position) {
+            transform.position = position;
+            return this;
+        }
+
+        /// <summary>
         /// Openly modify the AudioSource attached to this AudioEffect.
         /// Any settings applied will be in place until the next call to Play().
         /// </summary>
@@ -130,6 +145,25 @@ namespace AudioTag {
         public AudioEffect ModifySource(Action<AudioSource> action) {
             action(source);
             overrideAny = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Stops the AudioEffect.
+        /// This is only necessary for stopping an effect early or stopping a looping effect.
+        /// </summary>
+        public AudioEffect Stop() {
+            source.Stop();
+            return this;
+        }
+
+        public AudioEffect Load() {
+            data.Load();
+            return this;
+        }
+
+        public AudioEffect Unload() {
+            data.Unload();
             return this;
         }
     }
