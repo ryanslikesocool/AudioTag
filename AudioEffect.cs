@@ -18,25 +18,19 @@ namespace AudioTag {
         [BoxGroup("Info"), ShowInInspector, ReadOnly] public int ID => data == null ? 0 : data.ID;
         [HorizontalGroup("Info/H1"), ToggleLeft, ShowInInspector, ReadOnly] public bool Active => gameObject.activeInHierarchy;
         [HorizontalGroup("Info/H1"), ToggleLeft, ShowInInspector, ReadOnly] public bool Playing => source == null ? false : source.isPlaying;
-
-        [SerializeField] protected AudioSource source = null;
-        public bool IsVirtual => data.isVirtual;
-        protected AudioClip[] Clips => data.clips;
-        protected bool RandomClip => data.randomClip;
-        protected bool RandomPitch => data.randomPitch;
-        protected Vector2 PitchRange => data.pitchRange;
 #else
         public int ID => data.ID;
         public bool Active => gameObject.activeInHierarchy;
         public bool Playing => source == null ? false : source.isPlaying;
-
+#endif
         [SerializeField] protected AudioSource source = null;
+
         public bool IsVirtual => data.isVirtual;
         protected AudioClip[] Clips => data.clips;
         protected bool RandomClip = false;
         protected bool RandomPitch = false;
         protected Vector2 PitchRange => data.pitchRange;
-#endif
+        protected float FixedPitch => data.fixedPitch;
 
         private bool overrideAny = false;
         private bool overrideClipIndex = false;
@@ -62,7 +56,7 @@ namespace AudioTag {
                     if (RandomPitch) {
                         source.pitch = UnityEngine.Random.Range(PitchRange.x, PitchRange.y);
                     } else {
-                        source.pitch = 1;
+                        source.pitch = FixedPitch;
                     }
                 }
                 if (!overrideVolume) {
