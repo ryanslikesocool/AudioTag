@@ -108,20 +108,26 @@ namespace AudioTag {
             return null;
         }
 
-        public static void LoadSet(string tag) => LoadSet(Strings.Add(tag));
+        public static void LoadSet(AudioEffectSet set) => LoadSet(set.ID);
 
-        public static void LoadSet(int id) {
+        public static AudioEffectSet LoadSet(string tag) => LoadSet(Strings.Add(tag));
+
+        public static AudioEffectSet LoadSet(int id) {
             if (id == 0) {
                 Debug.LogError("The set ID cannot be 0.");
-                return;
+                return null;
             }
 
             if (Shared.setLink.TryGetValue(id, out AudioEffectSet set)) {
                 set.Load();
+                return set;
             } else {
                 Debug.LogWarning($"AudioEffectSet with ID '{id}' (with possible tag '{Strings.Get(id)}') does not exist.");
+                return null;
             }
         }
+
+        public static void UnloadSet(AudioEffectSet set) => UnloadSet(set.ID);
 
         public static void UnloadSet(string tag) => UnloadSet(Strings.Add(tag));
 
@@ -152,7 +158,7 @@ namespace AudioTag {
         /// <returns>The AudioEffect with the defined ID, if one was found.</returns>
         public static AudioEffect Play(int id) => Peek(id).Play();
 
-        public static void SetVolume(string tag, float percent) {
+        public static void SetMixerVolume(string tag, float percent) {
             if (percent == 0) {
                 Shared.mixer.SetFloat(tag, -80);
             } else {

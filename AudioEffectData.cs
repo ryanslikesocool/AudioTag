@@ -42,6 +42,17 @@ namespace AudioTag {
 
         public bool RequiresLoading => clips.Any(clip => !clip.preloadAudioData);
 
+        public bool IsLoaded {
+            get {
+                foreach (AudioClip clip in clips) {
+                    if (clip.loadState != AudioDataLoadState.Loaded) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
         public void Load() {
             foreach (AudioClip clip in clips) {
                 clip.LoadAudioData();

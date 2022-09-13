@@ -21,6 +21,17 @@ namespace AudioTag {
         public AudioEffectData[] data = new AudioEffectData[0];
 #endif
 
+        public bool IsLoaded {
+            get {
+                foreach (AudioEffectData d in data) {
+                    if (!d.IsLoaded) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
         public void Load() {
             foreach (AudioEffectData d in data) {
                 if (d.RequiresLoading) {
