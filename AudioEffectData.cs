@@ -23,6 +23,11 @@ namespace AudioTag {
         [BoxGroup("Pitch")] public bool randomPitch = false;
         [BoxGroup("Pitch"), Range(-3, 3), HideIf("$randomPitch")] public float fixedPitch = 1;
         [BoxGroup("Pitch"), ShowIf("$randomPitch")] public Vector2 pitchRange = Vector2.one;
+
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool RequiresLoading => clips.Any(clip => !clip.preloadAudioData);
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoaded => clips.All(clip => clip.loadState == AudioDataLoadState.Loaded);
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoading => clips.Any(clip => clip.loadState == AudioDataLoadState.Loading);
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsUnloaded => clips.Any(clip => clip.loadState == AudioDataLoadState.Unloaded);
 #else
         [Tooltip("The effect's tag, used to access the audio effect in code.")] public string tag = string.Empty;
         [Tooltip("The internal ID used for runtime access.  Do not reference this value directly, as it may change.")] public int ID => Strings.Add(tag);
@@ -38,30 +43,26 @@ namespace AudioTag {
         [Header("Pitch")] public bool randomPitch = false;
         [Range(-3, 3)] public float fixedPitch = 1;
         public Vector2 pitchRange = Vector2.one;
-#endif
 
         public bool RequiresLoading => clips.Any(clip => !clip.preloadAudioData);
-
-        public bool IsLoaded {
-            get {
-                foreach (AudioClip clip in clips) {
-                    if (clip.loadState != AudioDataLoadState.Loaded) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
+        public bool IsLoaded => clips.All(clip => clip.loadState == AudioDataLoadState.Loaded);
+        public bool IsLoading => clips.Any(clip => clip.loadState == AudioDataLoadState.Loading);
+        public bool IsUnloaded => clips.Any(clip => clip.loadState == AudioDataLoadState.Unloaded);
+#endif
 
         public void Load() {
             foreach (AudioClip clip in clips) {
-                clip.LoadAudioData();
+                if (clip.loadState == AudioDataLoadState.Unloaded) {
+                    clip.LoadAudioData();
+                }
             }
         }
 
         public void Unload() {
             foreach (AudioClip clip in clips) {
-                clip.UnloadAudioData();
+                if (clip.loadState != AudioDataLoadState.Unloaded) {
+                    clip.UnloadAudioData();
+                }
             }
         }
     }
