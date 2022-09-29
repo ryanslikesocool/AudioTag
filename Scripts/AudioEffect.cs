@@ -27,8 +27,8 @@ namespace AudioTag {
 
         public bool IsVirtual => data.isVirtual;
         protected AudioClip[] Clips => data.clips;
-        protected bool RandomClip = false;
-        protected bool RandomPitch = false;
+        protected bool RandomClip => data.randomClip;
+        protected bool RandomPitch => data.randomPitch;
         protected Vector2 PitchRange => data.pitchRange;
         protected float FixedPitch => data.fixedPitch;
 

@@ -34,7 +34,7 @@ namespace AudioTag {
 
         private void Awake() {
             Shared = this;
-            Strings.Reset();
+            Strings.Clear();
 
             foreach (AudioEffectSet set in sets) {
                 if (set.loadOnLaunch) {

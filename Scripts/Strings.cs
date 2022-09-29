@@ -6,7 +6,7 @@ namespace AudioTag {
     internal class Strings {
         private static Dictionary<int, string> backing = new Dictionary<int, string>();
 
-        public static void Reset() => backing.Clear();
+        public static void Clear() => backing.Clear();
 
         public static int Add(string str) {
             if (!string.IsNullOrEmpty(str)) {
@@ -16,6 +16,8 @@ namespace AudioTag {
             }
             return 0;
         }
+
+        public static bool TryGet(int id, out string str) => backing.TryGetValue(id, out str);
 
         public static string Get(int id) {
             backing.TryGetValue(id, out string str);
