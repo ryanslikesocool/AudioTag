@@ -18,6 +18,7 @@ namespace AudioTag {
         [SerializeField, Searchable] private AudioEffectSet[] sets = new AudioEffectSet[0];
         [SerializeField, Searchable] private AudioEffectData[] data = new AudioEffectData[0];
         [SerializeField, Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = null;
+        [SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffect> prefabLink = null;
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, List<AudioEffect>> effectLink = null;
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffectSet> setLink = null;
@@ -25,6 +26,7 @@ namespace AudioTag {
         [SerializeField] private AudioEffectSet[] sets = new AudioEffectSet[0];
         [SerializeField] private AudioEffectData[] data = new AudioEffectData[0];
         [SerializeField, Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = null;
+        [SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
         private Dictionary<int, AudioEffect> prefabLink = null;
         private Dictionary<int, List<AudioEffect>> effectLink = null;
         private Dictionary<int, AudioEffectSet> setLink = null;
@@ -69,6 +71,7 @@ namespace AudioTag {
         private AudioEffect CreatePrefab(AudioEffectData data) {
             AudioEffect prefab = data.prefabOverride == null ? sourcePrefab : data.prefabOverride;
             AudioEffect e = Instantiate(prefab);
+            e.gameObject.hideFlags = effectHideFlags;
 
             e.Prepare(data);
 
@@ -99,6 +102,8 @@ namespace AudioTag {
                 }
 
                 AudioEffect result = Instantiate(Shared.prefabLink[id]);
+                result.gameObject.hideFlags = Shared.effectHideFlags;
+
                 result.Prepare(Shared.prefabLink[id].data);
                 effects.Add(result);
                 return result;
