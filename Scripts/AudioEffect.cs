@@ -26,16 +26,24 @@ namespace AudioTag {
         [SerializeField] protected AudioSource source = null;
 
         public bool IsVirtual => data.isVirtual;
+        protected bool Loop => data.loop;
         protected AudioClip[] Clips => data.clips;
         protected bool RandomClip => data.randomClip;
         protected bool RandomPitch => data.randomPitch;
         protected Vector2 PitchRange => data.pitchRange;
         protected float FixedPitch => data.fixedPitch;
+        protected float SpatialBlend => data.spatialBlend;
+        protected float ReverbZoneMix => data.reverbZoneMix;
+        protected float DopplerLevel => data.dopplerLevel;
+        protected float Spread => data.spread;
+        protected float MinDistance => data.minDistance;
+        protected float MaxDistance => data.maxDistance;
 
         private bool overrideAny = false;
         private bool overrideClipIndex = false;
         private bool overrideVolume = false;
         private bool overridePitch = false;
+        private bool override3D = false;
 
         internal void Prepare(AudioEffectData data) {
             this.data = data;
@@ -47,6 +55,8 @@ namespace AudioTag {
         /// </summary>
         public AudioEffect Play() {
             if (!overrideAny) {
+                source.loop = Loop;
+
                 if (!overrideClipIndex) {
                     if (Clips.Length > 1 && RandomClip) {
                         clipIndex = UnityEngine.Random.Range(0, Clips.Length);
@@ -61,6 +71,13 @@ namespace AudioTag {
                 }
                 if (!overrideVolume) {
                     source.volume = data.volume;
+                }
+                if (!override3D) {
+                    source.spatialBlend = SpatialBlend;
+                    source.dopplerLevel = DopplerLevel;
+                    source.spread = Spread;
+                    source.minDistance = MinDistance;
+                    source.maxDistance = MaxDistance;
                 }
             }
 
@@ -79,6 +96,7 @@ namespace AudioTag {
             overrideClipIndex = false;
             overrideVolume = false;
             overridePitch = false;
+            override3D = false;
 
             return this;
         }

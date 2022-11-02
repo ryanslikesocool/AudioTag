@@ -15,19 +15,29 @@ namespace AudioTag {
         [BoxGroup("General"), Tooltip("Override the default audio source prefab with this.  Leave empty for the default, or if you're unsure.")] public AudioEffect prefabOverride = null;
         [BoxGroup("General"), Tooltip("The Audio Mixer Group to output to.  Setting this will override the value in a containing AudioEffectSet")] public AudioMixerGroup mixerGroup = null;
         [BoxGroup("General"), Tooltip("Should the audio source be marked virtual?")] public bool isVirtual = true;
+        [BoxGroup("General")] public bool loop = false;
         [BoxGroup("General"), Range(0, 1)] public float volume = 1;
+        [BoxGroup("General"), Range(0, 256)] public int priority = 128;
 
         [BoxGroup("Clip"), ListDrawerSettings(Expanded = true)] public AudioClip[] clips = new AudioClip[0];
         [BoxGroup("Clip"), DisableIf("$randomClip"), HideIf("@clips.Length < 2"), PropertyRange(0, "@clips.Length - 1")] public int clipIndex = 0;
         [BoxGroup("Clip"), HideIf("@clips.Length < 2")] public bool randomClip = false;
+
         [BoxGroup("Pitch")] public bool randomPitch = false;
         [BoxGroup("Pitch"), Range(-3, 3), HideIf("$randomPitch")] public float fixedPitch = 1;
         [BoxGroup("Pitch"), ShowIf("$randomPitch")] public Vector2 pitchRange = Vector2.one;
 
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool RequiresLoading => clips.Any(clip => !clip.preloadAudioData);
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoaded => clips.All(clip => clip.loadState == AudioDataLoadState.Loaded);
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoading => clips.Any(clip => clip.loadState == AudioDataLoadState.Loading);
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsUnloaded => clips.Any(clip => clip.loadState == AudioDataLoadState.Unloaded);
+        [BoxGroup("Spatial"), Range(0, 1)] public float spatialBlend = 0;
+        [BoxGroup("Spatial"), EnableIf("@(spatialBlend > 0)"), Range(0, 1.1f)] public float reverbZoneMix = 1;
+        [BoxGroup("Spatial"), EnableIf("@(spatialBlend > 0)"), Range(0, 5)] public float dopplerLevel = 1;
+        [BoxGroup("Spatial"), EnableIf("@(spatialBlend > 0)"), Range(0, 360)] public float spread = 0;
+        [BoxGroup("Spatial"), EnableIf("@(spatialBlend > 0)")] public float minDistance = 1;
+        [BoxGroup("Spatial"), EnableIf("@(spatialBlend > 0)")] public float maxDistance = 500;
+
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool RequiresLoading => clips.Any(clip => clip != null ? !clip.preloadAudioData : false);
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoaded => clips.All(clip => clip != null ? clip.loadState == AudioDataLoadState.Loaded : true);
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoading => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Loading : true);
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsUnloaded => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Unloaded : true);
 #else
         [Tooltip("The effect's tag, used to access the audio effect in code.")] public string tag = string.Empty;
         [Tooltip("The internal ID used for runtime access.  Do not reference this value directly, as it may change.")] public int ID => Strings.Add(tag);
@@ -35,19 +45,29 @@ namespace AudioTag {
         [Header("General"), Tooltip("Override the default audio source prefab with this.  Leave empty for the default, or if you're unsure.")] public AudioEffect prefabOverride = null;
         [Tooltip("The Audio Mixer Group to output to.  Setting this will override the value in a containing AudioEffectSet")] public AudioMixerGroup mixerGroup = null;
         [Tooltip("Should the audio source be marked virtual?")] public bool isVirtual = true;
+        public bool loop = false;
         [Range(0, 1)] public float volume = 1;
+        [Range(0, 256)] public int priority = 128;
 
         [Header("Clip")] public AudioClip[] clips = new AudioClip[0];
         public int clipIndex = 0;
         public bool randomClip = false;
+
         [Header("Pitch")] public bool randomPitch = false;
         [Range(-3, 3)] public float fixedPitch = 1;
         public Vector2 pitchRange = Vector2.one;
 
-        public bool RequiresLoading => clips.Any(clip => !clip.preloadAudioData);
-        public bool IsLoaded => clips.All(clip => clip.loadState == AudioDataLoadState.Loaded);
-        public bool IsLoading => clips.Any(clip => clip.loadState == AudioDataLoadState.Loading);
-        public bool IsUnloaded => clips.Any(clip => clip.loadState == AudioDataLoadState.Unloaded);
+        [Header("Spatial"), Range(0, 1)] public float spatialBlend = 0;
+        [Range(0, 1.1f)] public float reverbZoneMix = 1;
+        [Range(0, 5)] public float dopplerLevel = 1;
+        [Range(0, 360)] public float spread = 0;
+        public float minDistance = 1;
+        public float maxDistance = 500;
+
+        public bool RequiresLoading => clips.Any(clip => clip != null ? !clip.preloadAudioData : false);
+        public bool IsLoaded => clips.All(clip => clip != null ? clip.loadState == AudioDataLoadState.Loaded : true);
+        public bool IsLoading => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Loading : true);
+        public bool IsUnloaded => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Unloaded : true);
 #endif
 
         public void Load() {
