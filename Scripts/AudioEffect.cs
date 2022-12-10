@@ -45,9 +45,15 @@ namespace AudioTag {
         private bool overridePitch = false;
         private bool override3D = false;
 
-        internal void Prepare(AudioEffectData data) {
+        internal void Init(AudioEffectData data) {
             this.data = data;
             this.clipIndex = 0;
+            gameObject.SetActive(true);
+        }
+
+        internal void Deinit() {
+            this.data = null;
+            gameObject.SetActive(false);
         }
 
         /// <summary>

@@ -19,17 +19,17 @@ namespace AudioTag {
         [SerializeField, Searchable] private AudioEffectData[] data = new AudioEffectData[0];
         [SerializeField, Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = null;
         [SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffectSet> setLink = null;
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffect> prefabLink = null;
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, List<AudioEffect>> effectLink = null;
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffectSet> setLink = null;
 #else
         [SerializeField] private AudioEffectSet[] sets = new AudioEffectSet[0];
         [SerializeField] private AudioEffectData[] data = new AudioEffectData[0];
         [SerializeField, Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = null;
         [SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
+        private Dictionary<int, AudioEffectSet> setLink = null;
         private Dictionary<int, AudioEffect> prefabLink = null;
         private Dictionary<int, List<AudioEffect>> effectLink = null;
-        private Dictionary<int, AudioEffectSet> setLink = null;
 #endif
 
         private AudioEffectData[] AllData => sets.SelectMany(s => s.data).Concat(data).ToArray();
@@ -46,9 +46,9 @@ namespace AudioTag {
         }
 
         private void OnEnable() {
+            setLink = new Dictionary<int, AudioEffectSet>();
             prefabLink = new Dictionary<int, AudioEffect>();
             effectLink = new Dictionary<int, List<AudioEffect>>();
-            setLink = new Dictionary<int, AudioEffectSet>();
 
             foreach (AudioEffectData d in AllData) {
                 int id = d.ID;
@@ -68,34 +68,17 @@ namespace AudioTag {
             }
         }
 
-        private AudioEffect CreatePrefab(AudioEffectData data) {
+        private AudioEffect CreatePrefab(in AudioEffectData data) {
             AudioEffect prefab = data.prefabOverride == null ? sourcePrefab : data.prefabOverride;
             AudioEffect e = Instantiate(prefab);
             e.gameObject.hideFlags = effectHideFlags;
 
-            e.Prepare(data);
+            e.Init(data);
 
             return e;
         }
 
-        /// <summary>
-        /// Peek the next available AudioEffect with the defined tag.
-        /// </summary>
-        /// <param name="tag">The tag to look for.</param>
-        /// <returns>The AudioEffect with the defined tag, if one was found.</returns>
-        public static AudioEffect Peek(string tag) => Peek(Strings.Add(tag));
-
-        /// <summary>
-        /// Peek the next available AudioEffect with the defined ID.
-        /// </summary>
-        /// <param name="id">The ID to look for.</param>
-        /// <returns>The AudioEffect with the defined ID, if one was found.</returns>
-        public static AudioEffect Peek(int id) {
-            if (id == 0) {
-                Debug.LogError("The effect ID cannot be 0.");
-                return null;
-            }
-
+        private AudioEffect GetInstance(in int id) {
             if (Shared.effectLink.TryGetValue(id, out List<AudioEffect> effects)) {
                 if (effects.Count > 0) {
                     return effects.First(e => e.Active && (!e.Playing || e.IsVirtual));
@@ -104,7 +87,7 @@ namespace AudioTag {
                 AudioEffect result = Instantiate(Shared.prefabLink[id]);
                 result.gameObject.hideFlags = Shared.effectHideFlags;
 
-                result.Prepare(Shared.prefabLink[id].data);
+                result.Init(Shared.prefabLink[id].data);
                 effects.Add(result);
                 return result;
             }
@@ -113,11 +96,32 @@ namespace AudioTag {
             return null;
         }
 
-        public static void LoadSet(AudioEffectSet set) => LoadSet(set.ID);
+        /// <summary>
+        /// Peek the next available AudioEffect with the defined tag.
+        /// </summary>
+        /// <param name="tag">The tag to look for.</param>
+        /// <returns>The AudioEffect with the defined tag, if one was found.</returns>
+        public static AudioEffect Peek(in string tag) => Peek(Strings.Add(tag));
 
-        public static AudioEffectSet LoadSet(string tag) => LoadSet(Strings.Add(tag));
+        /// <summary>
+        /// Peek the next available AudioEffect with the defined ID.
+        /// </summary>
+        /// <param name="id">The ID to look for.</param>
+        /// <returns>The AudioEffect with the defined ID, if one was found.</returns>
+        public static AudioEffect Peek(in int id) {
+            if (id == 0) {
+                Debug.LogError("The effect ID cannot be 0.");
+                return null;
+            }
 
-        public static AudioEffectSet LoadSet(int id) {
+            return Shared.GetInstance(id);
+        }
+
+        public static void LoadSet(in AudioEffectSet set) => LoadSet(set.ID);
+
+        public static AudioEffectSet LoadSet(in string tag) => LoadSet(Strings.Add(tag));
+
+        public static AudioEffectSet LoadSet(in int id) {
             if (id == 0) {
                 Debug.LogError("The set ID cannot be 0.");
                 return null;
@@ -132,11 +136,11 @@ namespace AudioTag {
             }
         }
 
-        public static void UnloadSet(AudioEffectSet set) => UnloadSet(set.ID);
+        public static void UnloadSet(in AudioEffectSet set) => UnloadSet(set.ID);
 
-        public static void UnloadSet(string tag) => UnloadSet(Strings.Add(tag));
+        public static void UnloadSet(in string tag) => UnloadSet(Strings.Add(tag));
 
-        public static void UnloadSet(int id) {
+        public static void UnloadSet(in int id) {
             if (id == 0) {
                 Debug.LogError("The set ID cannot be 0.");
                 return;
@@ -154,7 +158,7 @@ namespace AudioTag {
         /// </summary>
         /// <param name="tag">The tag to look for.</param>
         /// <returns>The AudioEffect with the defined tag, if one was found.</returns>
-        public static AudioEffect Play(string tag) => Play(Strings.Add(tag));
+        public static AudioEffect Play(in string tag) => Play(Strings.Add(tag));
 
         /// <summary>
         /// Play the next available AudioEffect with the defined ID.
@@ -163,12 +167,52 @@ namespace AudioTag {
         /// <returns>The AudioEffect with the defined ID, if one was found.</returns>
         public static AudioEffect Play(int id) => Peek(id).Play();
 
-        public static void SetMixerVolume(string tag, float percent) {
+        public static void SetMixerVolume(in string tag, in float percent) {
             if (percent == 0) {
                 Shared.mixer.SetFloat(tag, -80);
             } else {
                 Shared.mixer.SetFloat(tag, 20f * Mathf.Log10(percent));
             }
+        }
+
+        public static void AddSet(in AudioEffectSet set) {
+            Shared.setLink.Add(set.ID, set);
+            foreach (AudioEffectData data in set.data) {
+                Shared.AddEffect(data);
+            }
+        }
+
+        public static void RemoveSet(in AudioEffectSet set) {
+            foreach (AudioEffectData data in set.data) {
+                Shared.RemoveEffect(data);
+            }
+            Shared.setLink.Remove(set.ID);
+        }
+
+        private void AddEffect(in AudioEffectData data) {
+            int id = data.ID;
+            if (prefabLink.ContainsKey(id)) {
+                Debug.LogError($"The audio ID ('{id}', possibly named '{Strings.Get(id)}') assigned to {data.name} already exists.  Please retag one of these objects.  {data.name} will not be added to the link.");
+                return;
+            }
+
+            AudioEffect prefab = data.prefabOverride ?? this.sourcePrefab;
+
+            prefabLink.Add(id, prefab);
+            effectLink.Add(id, new List<AudioEffect>());
+        }
+
+        private void RemoveEffect(in AudioEffectData data) {
+            int id = data.ID;
+            if (!effectLink.TryGetValue(id, out List<AudioEffect> effects)) { return; }
+
+            foreach (AudioEffect e in effects) {
+                e.Deinit();
+                GameObject.Destroy(e.gameObject);
+            }
+            effects.Clear();
+            effectLink.Remove(id);
+            prefabLink.Remove(id);
         }
     }
 }
