@@ -30,7 +30,7 @@ namespace AudioTag {
         private Dictionary<int, List<AudioEffect>> effectLink = null;
 #endif
 
-        private AudioEffectData[] AllData => sets.FlatMap(s => s.data);
+        private AudioEffectData[] AllData => sets.FlatMap(s => s.data).Append(data);
 
         protected override void Awake() {
             base.Awake();
@@ -41,9 +41,11 @@ namespace AudioTag {
                     set.Load();
                 }
             }
+
+            Init();
         }
 
-        private void OnEnable() {
+        private void Init() {
             setLink = new Dictionary<int, AudioEffectSet>();
             prefabLink = new Dictionary<int, AudioEffect>();
             effectLink = new Dictionary<int, List<AudioEffect>>();
