@@ -1,12 +1,13 @@
 {
   "name": "com.developedwithlove.audiotag",
   "displayName": "AudioTag",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "unity": "2021.3",
   "description": "Tag/ID based audio system for Unity.",
   "documentationUrl": "https://github.com/ryanslikesocool/AudioTag",
   "dependencies": {
-    "com.unity.modules.audio": ""
+    "com.unity.modules.audio": "1.0.0",
+    "com.developedwithlove.foundation": "1.0.0"
   },
   "author": {
     "name": "Ryan Boyer",

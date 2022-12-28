@@ -1,7 +1,7 @@
 // Developed With Love by Ryan Boyer http://ryanjboyer.com <3
 
+using Foundation;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 #if ODIN_INSPECTOR_3
@@ -10,9 +10,7 @@ using Sirenix.OdinInspector;
 
 namespace AudioTag {
     [DisallowMultipleComponent]
-    public class AudioPool : MonoBehaviour {
-        public static AudioPool Shared { get; private set; }
-
+    public sealed class AudioPool : Singleton<AudioPool> {
         [SerializeField] private AudioMixer mixer = null;
 #if ODIN_INSPECTOR_3
         [SerializeField, Searchable] private AudioEffectSet[] sets = new AudioEffectSet[0];
@@ -32,10 +30,10 @@ namespace AudioTag {
         private Dictionary<int, List<AudioEffect>> effectLink = null;
 #endif
 
-        private AudioEffectData[] AllData => sets.SelectMany(s => s.data).Concat(data).ToArray();
+        private AudioEffectData[] AllData => sets.FlatMap(s => s.data);
 
-        private void Awake() {
-            Shared = this;
+        protected override void Awake() {
+            base.Awake();
             Strings.Clear();
 
             foreach (AudioEffectSet set in sets) {
