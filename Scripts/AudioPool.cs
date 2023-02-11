@@ -1,34 +1,43 @@
 // Developed With Love by Ryan Boyer http://ryanjboyer.com <3
 
-using Foundation;
 using System.Collections.Generic;
+using Foundation;
 using UnityEngine;
 using UnityEngine.Audio;
 #if ODIN_INSPECTOR_3
 using Sirenix.OdinInspector;
 #endif
+using UnityEngine.Pool;
+using ClockKit;
 
 namespace AudioTag {
     [DisallowMultipleComponent]
     public sealed class AudioPool : Singleton<AudioPool> {
         [SerializeField] private AudioMixer mixer = null;
 #if ODIN_INSPECTOR_3
-        [SerializeField, Searchable] private AudioEffectSet[] sets = new AudioEffectSet[0];
-        [SerializeField, Searchable] private AudioEffectData[] data = new AudioEffectData[0];
-        [SerializeField, Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = null;
-        [SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffectSet> setLink = null;
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffect> prefabLink = null;
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, List<AudioEffect>> effectLink = null;
+        [SerializeField, TitleGroup("Data"), Searchable] private AudioEffectSet[] sets = default;
+        [SerializeField, TitleGroup("Data"), Searchable] private AudioEffectData[] data = default;
+        [SerializeField, TitleGroup("Object"), Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = default;
+        [SerializeField, TitleGroup("Object"), Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
+        [SerializeField, TitleGroup("Pooling")] private bool collectionChecks = true;
+        [SerializeField, TitleGroup("Pooling")] private int defaultCapacity = 10;
+        [SerializeField, TitleGroup("Pooling")] private int maxSize = 10_000;
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffectSet> setLink = default;
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, AudioEffect> prefabLink = default;
+        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<int, List<AudioEffect>> effectLink = default;
 #else
-        [SerializeField] private AudioEffectSet[] sets = new AudioEffectSet[0];
-        [SerializeField] private AudioEffectData[] data = new AudioEffectData[0];
-        [SerializeField, Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = null;
+        [SerializeField, Title("Data")] private AudioEffectSet[] sets = default;
+        [SerializeField] private AudioEffectData[] data = default;
+        [SerializeField, Title("Object"), Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = default;
         [SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
-        private Dictionary<int, AudioEffectSet> setLink = null;
-        private Dictionary<int, AudioEffect> prefabLink = null;
-        private Dictionary<int, List<AudioEffect>> effectLink = null;
+        [SerializeField, Title("Pooling")] private bool collectionChecks = true;
+        [SerializeField] private int defaultCapacity = 10;
+        [SerializeField] private int maxSize = 10_000;
+        private Dictionary<int, AudioEffectSet> setLink = default;
+        private Dictionary<int, AudioEffect> prefabLink = default;
+        private Dictionary<int, List<AudioEffect>> effectLink = default;
 #endif
+        private ObjectPool<AudioEffect> effectPool = default;
 
         private AudioEffectData[] AllData => sets.FlatMap(s => s.data).Append(data);
 
@@ -66,6 +75,16 @@ namespace AudioTag {
             foreach (AudioEffectSet set in sets) {
                 setLink.Add(set.ID, set);
             }
+
+            effectPool = new ObjectPool<AudioEffect>(
+                createFunc: PoolCreate,
+                actionOnGet: PoolGet,
+                actionOnRelease: PoolRelease,
+                actionOnDestroy: PoolDestroy,
+                collectionCheck: collectionChecks,
+                defaultCapacity: defaultCapacity,
+                maxSize: maxSize
+            );
         }
 
         private AudioEffect CreatePrefab(in AudioEffectData data) {
@@ -214,5 +233,51 @@ namespace AudioTag {
             effectLink.Remove(id);
             prefabLink.Remove(id);
         }
+
+        // MARK: - Pooling
+
+        private AudioEffect PoolCreate() {
+            AudioEffect result = Instantiate(sourcePrefab);
+            result.gameObject.hideFlags = effectHideFlags;
+            return result;
+        }
+
+        private void PoolGet(AudioEffect effect) {
+            // TODO
+        }
+
+        private void PoolRelease(AudioEffect effect) {
+            // TODO
+            effect.Deinit();
+        }
+
+        private void PoolDestroy(AudioEffect effect) {
+            Destroy(effect.gameObject);
+        }
+
+        public static AudioEffect Peek(in AudioEffectData data) {
+            AudioEffect result = Shared.effectPool.Get();
+            if (data != null) {
+                result.Init(data);
+            }
+            return result;
+        }
+
+        public static AudioEffect Play(in AudioEffectData data, bool autoReturn = true) {
+            AudioEffect result = Peek(data).Play();
+            if (autoReturn) {
+                Clock.Delay(duration: result.ActiveClip.length * result.ActivePitch, () => Return(result));
+            }
+            return result;
+        }
+
+        public static void Unload(in AudioEffect effect, bool returnToPool = true) {
+            effect.Unload();
+            if (returnToPool) {
+                Return(effect);
+            }
+        }
+
+        public static void Return(in AudioEffect effect) => Shared.effectPool.Release(effect);
     }
 }

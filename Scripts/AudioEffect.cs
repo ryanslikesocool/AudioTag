@@ -23,6 +23,9 @@ namespace AudioTag {
         public bool Active => gameObject.activeInHierarchy;
         public bool Playing => source == null ? false : source.isPlaying;
 #endif
+        public AudioClip ActiveClip => source.clip;
+        public float ActivePitch => source.pitch;
+
         [SerializeField] protected AudioSource source = null;
 
         public bool IsVirtual => data.isVirtual;
@@ -45,13 +48,13 @@ namespace AudioTag {
         private bool overridePitch = false;
         private bool override3D = false;
 
-        internal void Init(AudioEffectData data) {
+        public void Init(AudioEffectData data) {
             this.data = data;
             this.clipIndex = 0;
             gameObject.SetActive(true);
         }
 
-        internal void Deinit() {
+        public void Deinit() {
             this.data = null;
             gameObject.SetActive(false);
         }

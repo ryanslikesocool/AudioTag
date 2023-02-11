@@ -70,6 +70,8 @@ namespace AudioTag {
         public bool IsUnloaded => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Unloaded : true);
 #endif
 
+        public float Duration => clips.Max(clip => clip.length);
+
         public void Load() {
             foreach (AudioClip clip in clips) {
                 if (clip.loadState == AudioDataLoadState.Unloaded) {
