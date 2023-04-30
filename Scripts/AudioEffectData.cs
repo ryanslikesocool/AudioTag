@@ -19,7 +19,7 @@ namespace AudioTag {
         [BoxGroup("General"), Range(0, 1)] public float volume = 1;
         [BoxGroup("General"), Range(0, 256)] public int priority = 128;
 
-        [BoxGroup("Clip"), ListDrawerSettings(Expanded = true)] public AudioClip[] clips = new AudioClip[0];
+        [BoxGroup("Clip"), ListDrawerSettings(DefaultExpandedState = true)] public AudioClip[] clips = new AudioClip[0];
         [BoxGroup("Clip"), DisableIf("$randomClip"), HideIf("@clips.Length < 2"), PropertyRange(0, "@clips.Length - 1")] public int clipIndex = 0;
         [BoxGroup("Clip"), HideIf("@clips.Length < 2")] public bool randomClip = false;
 

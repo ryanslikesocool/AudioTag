@@ -13,7 +13,7 @@ namespace AudioTag {
         [BoxGroup("Info"), Tooltip("The internal ID used for runtime access.  Do not reference this value directly, as it may change."), ShowInInspector, ReadOnly] public int ID => Strings.Add(tag);
         [Tooltip("Should all of the effects in this set be loaded automatically?")] public bool loadOnLaunch = false;
         [Tooltip("The audio mixer group to output to.  Effect data may override this value.")] public AudioMixerGroup mixerGroup = null;
-        [Searchable, ListDrawerSettings(Expanded = true)] public AudioEffectData[] data = new AudioEffectData[0];
+        [Searchable, ListDrawerSettings(DefaultExpandedState = true)] public AudioEffectData[] data = new AudioEffectData[0];
 
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool RequiresLoading => data.Any(data => data.RequiresLoading);
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoaded => data.All(data => data.IsLoaded);

@@ -111,7 +111,7 @@ namespace AudioTag {
                 return result;
             }
 
-            Debug.LogWarning($"AudioEffect with ID '{id}' (with possible tag '{Strings.Get(id)}') does not exist.");
+            //Debug.LogWarning($"AudioEffect with ID '{id}' (with possible tag '{Strings.Get(id)}') does not exist.");
             return null;
         }
 
@@ -184,7 +184,7 @@ namespace AudioTag {
         /// </summary>
         /// <param name="id">The ID to look for.</param>
         /// <returns>The AudioEffect with the defined ID, if one was found.</returns>
-        public static AudioEffect Play(int id) => Peek(id).Play();
+        public static AudioEffect Play(int id) => Peek(id)?.Play();
 
         public static void SetMixerVolume(in string tag, in float percent) {
             if (percent == 0) {
@@ -256,6 +256,10 @@ namespace AudioTag {
         }
 
         public static AudioEffect Peek(in AudioEffectData data) {
+            if (data == null) {
+                return null;
+            }
+
             AudioEffect result = Shared.effectPool.Get();
             if (data != null) {
                 result.Init(data);
@@ -264,8 +268,9 @@ namespace AudioTag {
         }
 
         public static AudioEffect Play(in AudioEffectData data, bool autoReturn = true) {
-            AudioEffect result = Peek(data).Play();
-            if (autoReturn) {
+            AudioEffect result = Peek(data)?.Play();
+
+            if (autoReturn && result?.ActiveClip != null) {
                 Clock.Delay(duration: result.ActiveClip.length * result.ActivePitch, () => Return(result));
             }
             return result;
