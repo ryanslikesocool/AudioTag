@@ -9,6 +9,7 @@ using Sirenix.OdinInspector;
 #endif
 using UnityEngine.Pool;
 using ClockKit;
+using System.Linq;
 
 namespace AudioTag {
     [DisallowMultipleComponent]
@@ -39,7 +40,7 @@ namespace AudioTag {
 #endif
         private ObjectPool<AudioEffect> effectPool = default;
 
-        private AudioEffectData[] AllData => sets.FlatMap(s => s.data).Append(data);
+        private AudioEffectData[] AllData => sets.FlatMap(s => s.data).ToArray().Appending(data);
 
         protected override void Awake() {
             base.Awake();
@@ -100,7 +101,7 @@ namespace AudioTag {
         private AudioEffect GetInstance(in int id) {
             if (Shared.effectLink.TryGetValue(id, out List<AudioEffect> effects)) {
                 if (effects.Count > 0) {
-                    return effects.First(e => e.Active && (!e.Playing || e.IsVirtual));
+                    return Foundation.Extensions.First(effects, e => e.Active && (!e.Playing || e.IsVirtual));
                 }
 
                 AudioEffect result = Instantiate(Shared.prefabLink[id]);
@@ -271,7 +272,7 @@ namespace AudioTag {
             AudioEffect result = Peek(data)?.Play();
 
             if (autoReturn && result?.ActiveClip != null) {
-                Clock.Delay(duration: result.ActiveClip.length * result.ActivePitch, () => Return(result));
+                CKClock.Delay(duration: result.ActiveClip.length * result.ActivePitch, () => Return(result));
             }
             return result;
         }
