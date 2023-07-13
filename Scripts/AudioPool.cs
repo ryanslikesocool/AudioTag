@@ -9,7 +9,6 @@ using Sirenix.OdinInspector;
 #endif
 using UnityEngine.Pool;
 using ClockKit;
-using System.Linq;
 
 namespace AudioTag {
     [DisallowMultipleComponent]
@@ -272,7 +271,7 @@ namespace AudioTag {
             AudioEffect result = Peek(data)?.Play();
 
             if (autoReturn && result?.ActiveClip != null) {
-                CKClock.Delay(duration: result.ActiveClip.length * result.ActivePitch, () => Return(result));
+                CKClock.Delay(seconds: result.ActiveClip.length * result.ActivePitch, () => Return(result));
             }
             return result;
         }
