@@ -6,11 +6,10 @@ using Sirenix.OdinInspector;
 #endif
 
 namespace AudioTag {
-    [CreateAssetMenu(menuName = "Developed With Love/AudioTag/Audio Effect")]
-    public class AudioEffectData : ScriptableObject {
+    [CreateAssetMenu(menuName = "Developed With Love/AudioTag/Audio Effect Data")]
+    public sealed class AudioEffectData : ScriptableObject {
 #if ODIN_INSPECTOR_3
-        [BoxGroup("Info"), Tooltip("The effect's tag, used to access the audio effect in code.")] public string tag = string.Empty;
-        [BoxGroup("Info"), Tooltip("The internal ID used for runtime access.  Do not reference this value directly, as it may change."), ShowInInspector, ReadOnly] public int ID => Strings.Add(tag);
+        [BoxGroup("Info"), Tooltip("The effect's tag, used to access the audio effect in code.")] public AudioEffectTag tag = new AudioEffectTag();
 
         [BoxGroup("General"), Tooltip("Override the default audio source prefab with this.  Leave empty for the default, or if you're unsure.")] public AudioEffect prefabOverride = null;
         [BoxGroup("General"), Tooltip("The Audio Mixer Group to output to.  Setting this will override the value in a containing AudioEffectSet")] public AudioMixerGroup mixerGroup = null;
@@ -39,8 +38,7 @@ namespace AudioTag {
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoading => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Loading : true);
         [BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsUnloaded => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Unloaded : true);
 #else
-        [Tooltip("The effect's tag, used to access the audio effect in code.")] public string tag = string.Empty;
-        [Tooltip("The internal ID used for runtime access.  Do not reference this value directly, as it may change.")] public int ID => Strings.Add(tag);
+        [Tooltip("The effect's tag, used to access the audio effect in code.")] public AudioTag tag = new AudioTag();
 
         [Header("General"), Tooltip("Override the default audio source prefab with this.  Leave empty for the default, or if you're unsure.")] public AudioEffect prefabOverride = null;
         [Tooltip("The Audio Mixer Group to output to.  Setting this will override the value in a containing AudioEffectSet")] public AudioMixerGroup mixerGroup = null;

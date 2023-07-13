@@ -11,15 +11,14 @@ namespace AudioTag {
     public class AudioEffect : MonoBehaviour {
         internal AudioEffectData data = null;
         protected int clipIndex = 0;
-        protected string Tag => data.tag;
         public AudioEffectData Data => data;
 
 #if ODIN_INSPECTOR_3
-        [BoxGroup("Info"), ShowInInspector, ReadOnly] public int ID => data == null ? 0 : data.ID;
+        [BoxGroup("Info"), ShowInInspector, ReadOnly] public AudioEffectTag.Runtime Tag => data?.tag ?? AudioEffectTag.Runtime.zero;
         [HorizontalGroup("Info/H1"), ToggleLeft, ShowInInspector, ReadOnly] public bool Active => gameObject.activeInHierarchy;
         [HorizontalGroup("Info/H1"), ToggleLeft, ShowInInspector, ReadOnly] public bool Playing => source == null ? false : source.isPlaying;
 #else
-        public int ID => data.ID;
+        public AudioTag.Runtime Tag => data.tag;
         public bool Active => gameObject.activeInHierarchy;
         public bool Playing => source == null ? false : source.isPlaying;
 #endif
