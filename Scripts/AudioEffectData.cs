@@ -9,7 +9,7 @@ namespace AudioTag {
 	[CreateAssetMenu(menuName = "Developed With Love/AudioTag/Audio Effect Data")]
 	public sealed class AudioEffectData : ScriptableObject {
 #if ODIN_INSPECTOR_3
-		[BoxGroup("Info"), Tooltip("The effect's key, used to access the audio effect in code.")] public AudioKey key = new AudioKey();
+		[BoxGroup("Info"), Tooltip("The effect's key, used to access the audio effect in code.")] public AudioKeyField key = default;
 
 		[BoxGroup("General"), Tooltip("Override the default audio source prefab with this.  Leave empty for the default, or if you're unsure.")] public AudioEffect prefabOverride = null;
 		[BoxGroup("General"), Tooltip("The Audio Mixer Group to output to.  Setting this will override the value in a containing AudioEffectSet")] public AudioMixerGroup mixerGroup = null;
@@ -38,7 +38,7 @@ namespace AudioTag {
 		[BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsLoading => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Loading : true);
 		[BoxGroup("Debug"), ShowInInspector, ReadOnly] public bool IsUnloaded => clips.Any(clip => clip != null ? clip.loadState == AudioDataLoadState.Unloaded : true);
 #else
-        [Tooltip("The effect's key, used to access the audio effect in code.")] public AudioKey key = new AudioKey();
+        [Tooltip("The effect's key, used to access the audio effect in code.")] public AudioKeyField key = default;
 
         [Header("General"), Tooltip("Override the default audio source prefab with this.  Leave empty for the default, or if you're unsure.")] public AudioEffect prefabOverride = null;
         [Tooltip("The Audio Mixer Group to output to.  Setting this will override the value in a containing AudioEffectSet")] public AudioMixerGroup mixerGroup = null;

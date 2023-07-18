@@ -1,0 +1,16 @@
+{
+    "name": "AudioTag.Editors",
+    "rootNamespace": "AudioTag.Editors",
+    "references": [
+        "GUID:e71646fcf745d49f899078092f217ff2"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

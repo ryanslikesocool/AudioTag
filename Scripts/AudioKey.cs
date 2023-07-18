@@ -5,14 +5,8 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace AudioTag {
-#if ODIN_INSPECTOR_3
-	[InlineProperty]
-#endif
 	[Serializable]
 	public struct AudioKey : IEquatable<AudioKey> {
-#if ODIN_INSPECTOR_3
-		[HideLabel]
-#endif
 		public string key;
 
 		public AudioKey(string key) {
@@ -23,13 +17,7 @@ namespace AudioTag {
 
 		public bool Equals(AudioKey other) => key == other.key;
 
-#if ODIN_INSPECTOR_3
-		[InlineProperty]
-#endif
 		public readonly struct Runtime : IEquatable<Runtime> {
-#if ODIN_INSPECTOR_3
-			[HideLabel]
-#endif
 			public readonly int key;
 
 			public Runtime(int key) {
