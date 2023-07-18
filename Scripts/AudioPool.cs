@@ -11,20 +11,20 @@ using UnityEngine.Pool;
 using ClockKit;
 
 namespace AudioTag {
-    [DisallowMultipleComponent]
-    public sealed class AudioPool : Singleton<AudioPool> {
-        [SerializeField] private AudioMixer mixer = null;
+	[DisallowMultipleComponent]
+	public sealed class AudioPool : Singleton<AudioPool> {
+		[SerializeField] private AudioMixer mixer = null;
 #if ODIN_INSPECTOR_3
-        [SerializeField, BoxGroup("Data"), Searchable] private AudioEffectSet[] sets = default;
-        [SerializeField, BoxGroup("Data"), Searchable] private AudioEffectData[] data = default;
-        [SerializeField, BoxGroup("Object"), Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = default;
-        [SerializeField, BoxGroup("Object"), Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
-        [SerializeField, BoxGroup("Pooling")] private bool collectionChecks = true;
-        [SerializeField, BoxGroup("Pooling")] private int defaultCapacity = 10;
-        [SerializeField, BoxGroup("Pooling")] private int maxSize = 10_000;
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioEffectTag.Runtime, AudioEffectSet> setLink = default;
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioEffectTag.Runtime, AudioEffect> prefabLink = default;
-        [BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioEffectTag.Runtime, List<AudioEffect>> effectLink = default;
+		[SerializeField, BoxGroup("Data"), Searchable] private AudioEffectSet[] sets = default;
+		[SerializeField, BoxGroup("Data"), Searchable] private AudioEffectData[] data = default;
+		[SerializeField, BoxGroup("Object"), Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = default;
+		[SerializeField, BoxGroup("Object"), Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
+		[SerializeField, BoxGroup("Pooling")] private bool collectionChecks = true;
+		[SerializeField, BoxGroup("Pooling")] private int defaultCapacity = 10;
+		[SerializeField, BoxGroup("Pooling")] private int maxSize = 10_000;
+		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey.Runtime, AudioEffectSet> setLink = default;
+		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey.Runtime, AudioEffect> prefabLink = default;
+		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey.Runtime, List<AudioEffect>> effectLink = default;
 #else
         [SerializeField, Title("Data")] private AudioEffectSet[] sets = default;
         [SerializeField] private AudioEffectData[] data = default;
@@ -37,216 +37,216 @@ namespace AudioTag {
         private Dictionary<int, AudioEffect> prefabLink = default;
         private Dictionary<int, List<AudioEffect>> effectLink = default;
 #endif
-        private ObjectPool<AudioEffect> effectPool = default;
+		private ObjectPool<AudioEffect> effectPool = default;
 
-        private IEnumerable<AudioEffectData> AllData => Foundation.Extensions.Join(sets.FlatMap(s => s.data), data);
+		private IEnumerable<AudioEffectData> AllData => Foundation.Extensions.Join(sets.FlatMap(s => s.data), data);
 
-        protected override void Awake() {
-            base.Awake();
+		protected override void Awake() {
+			base.Awake();
 
-            foreach (AudioEffectSet set in sets) {
-                if (set.loadOnLaunch) {
-                    set.Load();
-                }
-            }
+			foreach (AudioEffectSet set in sets) {
+				if (set.loadOnLaunch) {
+					set.Load();
+				}
+			}
 
-            Init();
-        }
+			Init();
+		}
 
-        private void Init() {
-            setLink = new Dictionary<AudioEffectTag.Runtime, AudioEffectSet>();
-            prefabLink = new Dictionary<AudioEffectTag.Runtime, AudioEffect>();
-            effectLink = new Dictionary<AudioEffectTag.Runtime, List<AudioEffect>>();
+		private void Init() {
+			setLink = new Dictionary<AudioKey.Runtime, AudioEffectSet>();
+			prefabLink = new Dictionary<AudioKey.Runtime, AudioEffect>();
+			effectLink = new Dictionary<AudioKey.Runtime, List<AudioEffect>>();
 
-            foreach (AudioEffectData d in AllData) {
-                AudioEffectTag.Runtime tag = d.tag;
-                if (prefabLink.ContainsKey(tag)) {
-                    Debug.LogError($"The audio tag assigned to {d.name} already exists.  Please retag one of these objects.  {d.name} will not be added to the link.");
-                    return;
-                }
+			foreach (AudioEffectData d in AllData) {
+				AudioKey.Runtime key = d.key;
+				if (prefabLink.ContainsKey(key)) {
+					Debug.LogError($"The audio key assigned to {d.name} already exists.  Please rekey one of these objects.  {d.name} will not be added to the link.");
+					return;
+				}
 
-                AudioEffect e = CreatePrefab(d);
+				AudioEffect e = CreatePrefab(d);
 
-                prefabLink.Add(tag, e);
-                effectLink.Add(tag, new List<AudioEffect>());
-            }
+				prefabLink.Add(key, e);
+				effectLink.Add(key, new List<AudioEffect>());
+			}
 
-            foreach (AudioEffectSet set in sets) {
-                setLink.Add(set.tag, set);
-            }
+			foreach (AudioEffectSet set in sets) {
+				setLink.Add(set.key, set);
+			}
 
-            effectPool = new ObjectPool<AudioEffect>(
-                createFunc: PoolCreate,
-                actionOnGet: PoolGet,
-                actionOnRelease: PoolRelease,
-                actionOnDestroy: PoolDestroy,
-                collectionCheck: collectionChecks,
-                defaultCapacity: defaultCapacity,
-                maxSize: maxSize
-            );
-        }
+			effectPool = new ObjectPool<AudioEffect>(
+				createFunc: PoolCreate,
+				actionOnGet: PoolGet,
+				actionOnRelease: PoolRelease,
+				actionOnDestroy: PoolDestroy,
+				collectionCheck: collectionChecks,
+				defaultCapacity: defaultCapacity,
+				maxSize: maxSize
+			);
+		}
 
-        private AudioEffect CreatePrefab(in AudioEffectData data) {
-            AudioEffect prefab = data.prefabOverride == null ? sourcePrefab : data.prefabOverride;
-            AudioEffect e = Instantiate(prefab);
-            e.gameObject.hideFlags = effectHideFlags;
+		private AudioEffect CreatePrefab(in AudioEffectData data) {
+			AudioEffect prefab = data.prefabOverride == null ? sourcePrefab : data.prefabOverride;
+			AudioEffect e = Instantiate(prefab);
+			e.gameObject.hideFlags = effectHideFlags;
 
-            e.Init(data);
+			e.Init(data);
 
-            return e;
-        }
+			return e;
+		}
 
-        private AudioEffect GetInstance(in AudioEffectTag.Runtime tag) {
-            if (Shared.effectLink.TryGetValue(tag, out List<AudioEffect> effects)) {
-                if (effects.Count > 0) {
-                    return Foundation.Extensions.First(effects, e => e.Active && (!e.Playing || e.IsVirtual));
-                }
+		private AudioEffect GetInstance(in AudioKey.Runtime key) {
+			if (Shared.effectLink.TryGetValue(key, out List<AudioEffect> effects)) {
+				if (effects.Count > 0) {
+					return Foundation.Extensions.First(effects, e => e.Active && (!e.Playing || e.IsVirtual));
+				}
 
-                AudioEffect result = Instantiate(Shared.prefabLink[tag]);
-                result.gameObject.hideFlags = Shared.effectHideFlags;
+				AudioEffect result = Instantiate(Shared.prefabLink[key]);
+				result.gameObject.hideFlags = Shared.effectHideFlags;
 
-                result.Init(Shared.prefabLink[tag].data);
-                effects.Add(result);
-                return result;
-            }
+				result.Init(Shared.prefabLink[key].data);
+				effects.Add(result);
+				return result;
+			}
 
-            //Debug.LogWarning($"AudioEffect with ID '{id}' (with possible tag '{Strings.Get(id)}') does not exist.");
-            return null;
-        }
+			//Debug.LogWarning($"AudioEffect with ID '{id}' (with possible key '{Strings.Get(id)}') does not exist.");
+			return null;
+		}
 
-        /// <summary>
-        /// Peek the next available AudioEffect with the defined tag.
-        /// </summary>
-        /// <param name="tag">The tag to look for.</param>
-        /// <returns>The AudioEffect with the defined tag, if one was found.</returns>
-        public static AudioEffect Peek(in AudioEffectTag.Runtime tag) => Shared.GetInstance(tag);
+		/// <summary>
+		/// Peek the next available AudioEffect with the defined key.
+		/// </summary>
+		/// <param name="key">The key to look for.</param>
+		/// <returns>The AudioEffect with the defined key, if one was found.</returns>
+		public static AudioEffect Peek(in AudioKey.Runtime key) => Shared.GetInstance(key);
 
-        public static void LoadSet(in AudioEffectSet set) => LoadSet(set.tag);
+		public static void LoadSet(in AudioEffectSet set) => LoadSet(set.key);
 
-        public static AudioEffectSet LoadSet(in AudioEffectTag.Runtime tag) {
-            if (Shared.setLink.TryGetValue(tag, out AudioEffectSet set)) {
-                set.Load();
-                return set;
-            } else {
-                Debug.LogWarning($"AudioEffectSet with tag '{tag}' does not exist.");
-                return null;
-            }
-        }
+		public static AudioEffectSet LoadSet(in AudioKey.Runtime key) {
+			if (Shared.setLink.TryGetValue(key, out AudioEffectSet set)) {
+				set.Load();
+				return set;
+			} else {
+				Debug.LogWarning($"AudioEffectSet with key '{key}' does not exist.");
+				return null;
+			}
+		}
 
-        public static void UnloadSet(in AudioEffectSet set) => UnloadSet(set.tag);
+		public static void UnloadSet(in AudioEffectSet set) => UnloadSet(set.key);
 
-        public static void UnloadSet(in AudioEffectTag.Runtime tag) {
-            if (Shared.setLink.TryGetValue(tag, out AudioEffectSet set)) {
-                set.Unload();
-            } else {
-                Debug.LogWarning($"AudioEffectSet with tag '{tag}' does not exist.");
-            }
-        }
+		public static void UnloadSet(in AudioKey.Runtime key) {
+			if (Shared.setLink.TryGetValue(key, out AudioEffectSet set)) {
+				set.Unload();
+			} else {
+				Debug.LogWarning($"AudioEffectSet with key '{key}' does not exist.");
+			}
+		}
 
-        /// <summary>
-        /// Play the next available AudioEffect with the defined tag.
-        /// </summary>
-        /// <param name="tagid">The tag to look for.</param>
-        /// <returns>The AudioEffect with the defined tag, if one was found.</returns>
-        public static AudioEffect Play(in AudioEffectTag.Runtime tag) => Peek(tag)?.Play();
+		/// <summary>
+		/// Play the next available AudioEffect with the defined key.
+		/// </summary>
+		/// <param name="key">The key to look for.</param>
+		/// <returns>The AudioEffect with the defined key, if one was found.</returns>
+		public static AudioEffect Play(in AudioKey.Runtime key) => Peek(key)?.Play();
 
-        public static void SetMixerVolume(in string tag, in float percent) {
-            if (percent == 0) {
-                Shared.mixer.SetFloat(tag, -80);
-            } else {
-                Shared.mixer.SetFloat(tag, 20f * Mathf.Log10(percent));
-            }
-        }
+		public static void SetMixerVolume(in string name, in float percent) {
+			if (percent == 0) {
+				Shared.mixer.SetFloat(name, -80);
+			} else {
+				Shared.mixer.SetFloat(name, 20f * Mathf.Log10(percent));
+			}
+		}
 
-        public static void AddSet(in AudioEffectSet set) {
-            Shared.setLink.Add(set.tag, set);
-            foreach (AudioEffectData data in set.data) {
-                Shared.AddEffect(data);
-            }
-        }
+		public static void AddSet(in AudioEffectSet set) {
+			Shared.setLink.Add(set.key, set);
+			foreach (AudioEffectData data in set.data) {
+				Shared.AddEffect(data);
+			}
+		}
 
-        public static void RemoveSet(in AudioEffectSet set) {
-            foreach (AudioEffectData data in set.data) {
-                Shared.RemoveEffect(data);
-            }
-            Shared.setLink.Remove(set.tag);
-        }
+		public static void RemoveSet(in AudioEffectSet set) {
+			foreach (AudioEffectData data in set.data) {
+				Shared.RemoveEffect(data);
+			}
+			Shared.setLink.Remove(set.key);
+		}
 
-        private void AddEffect(in AudioEffectData data) {
-            AudioEffectTag.Runtime tag = data.tag;
-            if (prefabLink.ContainsKey(tag)) {
-                Debug.LogError($"The audio tag assigned to {data.name} already exists.  Please retag one of these objects.  {data.name} will not be added to the link.");
-                return;
-            }
+		private void AddEffect(in AudioEffectData data) {
+			AudioKey.Runtime key = data.key;
+			if (prefabLink.ContainsKey(key)) {
+				Debug.LogError($"The audio key assigned to {data.name} already exists.  Please rekey one of these objects.  {data.name} will not be added to the link.");
+				return;
+			}
 
-            AudioEffect prefab = data.prefabOverride ?? this.sourcePrefab;
+			AudioEffect prefab = data.prefabOverride ?? this.sourcePrefab;
 
-            prefabLink.Add(tag, prefab);
-            effectLink.Add(tag, new List<AudioEffect>());
-        }
+			prefabLink.Add(key, prefab);
+			effectLink.Add(key, new List<AudioEffect>());
+		}
 
-        private void RemoveEffect(in AudioEffectData data) {
-            AudioEffectTag.Runtime tag = data.tag;
-            if (!effectLink.TryGetValue(tag, out List<AudioEffect> effects)) { return; }
+		private void RemoveEffect(in AudioEffectData data) {
+			AudioKey.Runtime key = data.key;
+			if (!effectLink.TryGetValue(key, out List<AudioEffect> effects)) { return; }
 
-            foreach (AudioEffect e in effects) {
-                e.Deinit();
-                GameObject.Destroy(e.gameObject);
-            }
-            effects.Clear();
-            effectLink.Remove(tag);
-            prefabLink.Remove(tag);
-        }
+			foreach (AudioEffect e in effects) {
+				e.Deinit();
+				GameObject.Destroy(e.gameObject);
+			}
+			effects.Clear();
+			effectLink.Remove(key);
+			prefabLink.Remove(key);
+		}
 
-        // MARK: - Pooling
+		// MARK: - Pooling
 
-        private AudioEffect PoolCreate() {
-            AudioEffect result = Instantiate(sourcePrefab);
-            result.gameObject.hideFlags = effectHideFlags;
-            return result;
-        }
+		private AudioEffect PoolCreate() {
+			AudioEffect result = Instantiate(sourcePrefab);
+			result.gameObject.hideFlags = effectHideFlags;
+			return result;
+		}
 
-        private void PoolGet(AudioEffect effect) {
-            // TODO
-        }
+		private void PoolGet(AudioEffect effect) {
+			// TODO
+		}
 
-        private void PoolRelease(AudioEffect effect) {
-            // TODO
-            effect.Deinit();
-        }
+		private void PoolRelease(AudioEffect effect) {
+			// TODO
+			effect.Deinit();
+		}
 
-        private void PoolDestroy(AudioEffect effect) {
-            Destroy(effect.gameObject);
-        }
+		private void PoolDestroy(AudioEffect effect) {
+			Destroy(effect.gameObject);
+		}
 
-        public static AudioEffect Peek(in AudioEffectData data) {
-            if (data == null) {
-                return null;
-            }
+		public static AudioEffect Peek(in AudioEffectData data) {
+			if (data == null) {
+				return null;
+			}
 
-            AudioEffect result = Shared.effectPool.Get();
-            if (data != null) {
-                result.Init(data);
-            }
-            return result;
-        }
+			AudioEffect result = Shared.effectPool.Get();
+			if (data != null) {
+				result.Init(data);
+			}
+			return result;
+		}
 
-        public static AudioEffect Play(in AudioEffectData data, bool autoReturn = true) {
-            AudioEffect result = Peek(data)?.Play();
+		public static AudioEffect Play(in AudioEffectData data, bool autoReturn = true) {
+			AudioEffect result = Peek(data)?.Play();
 
-            if (autoReturn && result?.ActiveClip != null) {
-                CKClock.Delay(seconds: result.ActiveClip.length * result.ActivePitch, () => Return(result));
-            }
-            return result;
-        }
+			if (autoReturn && result?.ActiveClip != null) {
+				CKClock.Delay(seconds: result.ActiveClip.length * result.ActivePitch, () => Return(result));
+			}
+			return result;
+		}
 
-        public static void Unload(in AudioEffect effect, bool returnToPool = true) {
-            effect.Unload();
-            if (returnToPool) {
-                Return(effect);
-            }
-        }
+		public static void Unload(in AudioEffect effect, bool returnToPool = true) {
+			effect.Unload();
+			if (returnToPool) {
+				Return(effect);
+			}
+		}
 
-        public static void Return(in AudioEffect effect) => Shared.effectPool.Release(effect);
-    }
+		public static void Return(in AudioEffect effect) => Shared.effectPool.Release(effect);
+	}
 }
