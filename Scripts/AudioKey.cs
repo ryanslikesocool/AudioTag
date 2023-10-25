@@ -1,8 +1,4 @@
 using System;
-#if ODIN_INSPECTOR_3
-using Sirenix.OdinInspector;
-#endif
-using UnityEngine;
 
 namespace AudioTag {
 	[Serializable]
@@ -13,9 +9,10 @@ namespace AudioTag {
 			this.key = key;
 		}
 
-		public static implicit operator Runtime(AudioKey tag) => new Runtime(tag);
+		public static implicit operator Runtime(AudioKey key) => new Runtime(key);
+		public static implicit operator AudioKey(string key) => new AudioKey(key);
 
-		public bool Equals(AudioKey other) => key == other.key;
+		public readonly bool Equals(AudioKey other) => key == other.key;
 
 		public readonly struct Runtime : IEquatable<Runtime> {
 			public readonly int key;
@@ -28,7 +25,7 @@ namespace AudioTag {
 
 			public static readonly Runtime zero = new Runtime(0);
 
-			public bool Equals(AudioKey.Runtime other) => key == other.key;
+			public bool Equals(Runtime other) => key == other.key;
 
 			public static bool operator ==(Runtime lhs, Runtime rhs) => lhs.Equals(rhs);
 			public static bool operator !=(Runtime lhs, Runtime rhs) => !lhs.Equals(rhs);

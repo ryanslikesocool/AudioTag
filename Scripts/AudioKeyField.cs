@@ -7,14 +7,16 @@ namespace AudioTag {
 		[SerializeField] private AudioKeyReference _reference;
 		[SerializeField] private AudioKey _value;
 
-		public AudioKey.Runtime key => _reference?.key ?? _value;
+		public readonly AudioKey.Runtime key => _reference?.key ?? _value;
 
-		public bool Equals(AudioKeyField other) => key == other.key;
+		public readonly bool Equals(AudioKeyField other) => key == other.key;
 
 		public static implicit operator AudioKey.Runtime(AudioKeyField field) => field.key;
 
+		public static implicit operator AudioKeyField(string key) => new AudioKeyField { _value = new AudioKey(key) };
+
 		public static bool operator ==(AudioKeyField lhs, AudioKeyField rhs) => lhs.Equals(rhs);
-		public static bool operator !=(AudioKeyField lhs, AudioKeyField rhs) => lhs.Equals(rhs);
+		public static bool operator !=(AudioKeyField lhs, AudioKeyField rhs) => !lhs.Equals(rhs);
 
 		public override bool Equals(object other) => other switch {
 			AudioKeyField _other => this.Equals(_other),
