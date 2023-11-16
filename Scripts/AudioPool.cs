@@ -22,9 +22,9 @@ namespace AudioTag {
 		[SerializeField, BoxGroup("Pooling")] private bool collectionChecks = true;
 		[SerializeField, BoxGroup("Pooling")] private int defaultCapacity = 10;
 		[SerializeField, BoxGroup("Pooling")] private int maxSize = 10_000;
-		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey.Runtime, AudioEffectSet> setLink = default;
-		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey.Runtime, AudioEffect> prefabLink = default;
-		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey.Runtime, List<AudioEffect>> effectLink = default;
+		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey, AudioEffectSet> setLink = default;
+		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey, AudioEffect> prefabLink = default;
+		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey, List<AudioEffect>> effectLink = default;
 #else
         [SerializeField, Title("Data")] private AudioEffectSet[] sets = default;
         [SerializeField] private AudioEffectData[] data = default;
@@ -33,9 +33,9 @@ namespace AudioTag {
         [SerializeField, Title("Pooling")] private bool collectionChecks = true;
         [SerializeField] private int defaultCapacity = 10;
         [SerializeField] private int maxSize = 10_000;
-        private Dictionary<int, AudioEffectSet> setLink = default;
-        private Dictionary<int, AudioEffect> prefabLink = default;
-        private Dictionary<int, List<AudioEffect>> effectLink = default;
+        private Dictionary<AudioKey, AudioEffectSet> setLink = default;
+        private Dictionary<AudioKey, AudioEffect> prefabLink = default;
+        private Dictionary<AudioKey, List<AudioEffect>> effectLink = default;
 #endif
 		private ObjectPool<AudioEffect> effectPool = default;
 
@@ -54,14 +54,14 @@ namespace AudioTag {
 		}
 
 		private void Init() {
-			setLink = new Dictionary<AudioKey.Runtime, AudioEffectSet>();
-			prefabLink = new Dictionary<AudioKey.Runtime, AudioEffect>();
-			effectLink = new Dictionary<AudioKey.Runtime, List<AudioEffect>>();
+			setLink = new Dictionary<AudioKey, AudioEffectSet>();
+			prefabLink = new Dictionary<AudioKey, AudioEffect>();
+			effectLink = new Dictionary<AudioKey, List<AudioEffect>>();
 
 			foreach (AudioEffectData d in AllData) {
-				AudioKey.Runtime key = d.key;
+				AudioKey key = d.key;
 				if (prefabLink.ContainsKey(key)) {
-					Debug.LogError($"The audio key assigned to {d.name} already exists.  Please rekey one of these objects.  {d.name} will not be added to the link.");
+					Debug.LogWarning($"The audio key assigned to {d.name} already exists.  {d.name} will not be added to the link.");
 					return;
 				}
 
@@ -96,7 +96,7 @@ namespace AudioTag {
 			return e;
 		}
 
-		private AudioEffect GetInstance(in AudioKey.Runtime key) {
+		private AudioEffect GetInstance(in AudioKey key) {
 			if (Shared.effectLink.TryGetValue(key, out List<AudioEffect> effects)) {
 				if (effects.Count > 0) {
 					return Foundation.Extensions.First(effects, e => e.Active && (!e.Playing || e.IsVirtual));
@@ -119,27 +119,27 @@ namespace AudioTag {
 		/// </summary>
 		/// <param name="key">The key to look for.</param>
 		/// <returns>The AudioEffect with the defined key, if one was found.</returns>
-		public static AudioEffect Peek(in AudioKey.Runtime key) => Shared.GetInstance(key);
+		public static AudioEffect Peek(in AudioKey key) => Shared.GetInstance(key);
 
 		public static void LoadSet(in AudioEffectSet set) => LoadSet(set.key);
 
-		public static AudioEffectSet LoadSet(in AudioKey.Runtime key) {
+		public static AudioEffectSet LoadSet(in AudioKey key) {
 			if (Shared.setLink.TryGetValue(key, out AudioEffectSet set)) {
 				set.Load();
 				return set;
 			} else {
-				Debug.LogWarning($"AudioEffectSet with key '{key}' does not exist.");
+				Debug.LogWarning($"AudioEffectSet with key '{key.key}' does not exist.");
 				return null;
 			}
 		}
 
 		public static void UnloadSet(in AudioEffectSet set) => UnloadSet(set.key);
 
-		public static void UnloadSet(in AudioKey.Runtime key) {
+		public static void UnloadSet(in AudioKey key) {
 			if (Shared.setLink.TryGetValue(key, out AudioEffectSet set)) {
 				set.Unload();
 			} else {
-				Debug.LogWarning($"AudioEffectSet with key '{key}' does not exist.");
+				Debug.LogWarning($"AudioEffectSet with key '{key.key}' does not exist.");
 			}
 		}
 
@@ -148,7 +148,7 @@ namespace AudioTag {
 		/// </summary>
 		/// <param name="key">The key to look for.</param>
 		/// <returns>The AudioEffect with the defined key, if one was found.</returns>
-		public static AudioEffect Play(in AudioKey.Runtime key) => Peek(key)?.Play();
+		public static AudioEffect Play(in AudioKey key) => Peek(key)?.Play();
 
 		public static void SetMixerVolume(in string name, in float percent) {
 			if (percent == 0) {
@@ -173,7 +173,7 @@ namespace AudioTag {
 		}
 
 		private void AddEffect(in AudioEffectData data) {
-			AudioKey.Runtime key = data.key;
+			AudioKey key = data.key;
 			if (prefabLink.ContainsKey(key)) {
 				Debug.LogError($"The audio key assigned to {data.name} already exists.  Please rekey one of these objects.  {data.name} will not be added to the link.");
 				return;
@@ -186,7 +186,7 @@ namespace AudioTag {
 		}
 
 		private void RemoveEffect(in AudioEffectData data) {
-			AudioKey.Runtime key = data.key;
+			AudioKey key = data.key;
 			if (!effectLink.TryGetValue(key, out List<AudioEffect> effects)) { return; }
 
 			foreach (AudioEffect e in effects) {

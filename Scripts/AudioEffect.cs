@@ -14,7 +14,7 @@ namespace AudioTag {
 		public AudioEffectData Data => data;
 
 #if ODIN_INSPECTOR_3
-		[BoxGroup("Info"), ShowInInspector, ReadOnly] public AudioKey.Runtime key => data?.key ?? AudioKey.Runtime.zero;
+		[BoxGroup("Info"), ShowInInspector, ReadOnly] public AudioKey key => data?.key ?? default;
 		[HorizontalGroup("Info/H1"), ToggleLeft, ShowInInspector, ReadOnly] public bool Active => gameObject.activeInHierarchy;
 		[HorizontalGroup("Info/H1"), ToggleLeft, ShowInInspector, ReadOnly] public bool Playing => source == null ? false : source.isPlaying;
 #else
