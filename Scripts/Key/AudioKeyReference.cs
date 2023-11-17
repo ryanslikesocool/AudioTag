@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace AudioTag {
-	[CreateAssetMenu(menuName = "Developed With Love/Audio Tag/Audio Key")]
+	[CreateAssetMenu(menuName = "Developed With Love/AudioTag/Audio Key")]
 	public sealed class AudioKeyReference : ScriptableObject {
 		[SerializeField] private string _key = default;
 		public string key => _key;
