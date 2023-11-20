@@ -4,42 +4,32 @@ using System.Collections.Generic;
 using Foundation;
 using UnityEngine;
 using UnityEngine.Audio;
-#if ODIN_INSPECTOR_3
-using Sirenix.OdinInspector;
-#endif
 using UnityEngine.Pool;
 using ClockKit;
 
 namespace AudioTag {
 	[DisallowMultipleComponent]
 	public sealed class AudioPool : Singleton<AudioPool> {
-		[SerializeField] private AudioMixer mixer = null;
-#if ODIN_INSPECTOR_3
-		[SerializeField, BoxGroup("Data"), Searchable] private AudioEffectSet[] sets = default;
-		[SerializeField, BoxGroup("Data"), Searchable] private AudioEffectData[] data = default;
-		[SerializeField, BoxGroup("Object"), Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = default;
-		[SerializeField, BoxGroup("Object"), Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
-		[SerializeField, BoxGroup("Pooling")] private bool collectionChecks = true;
-		[SerializeField, BoxGroup("Pooling")] private int defaultCapacity = 10;
-		[SerializeField, BoxGroup("Pooling")] private int maxSize = 10_000;
-		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey, AudioEffectSet> setLink = default;
-		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey, AudioEffect> prefabLink = default;
-		[BoxGroup("Debug"), ShowInInspector, ReadOnly] private Dictionary<AudioKey, List<AudioEffect>> effectLink = default;
-#else
-        [SerializeField, Title("Data")] private AudioEffectSet[] sets = default;
-        [SerializeField] private AudioEffectData[] data = default;
-        [SerializeField, Title("Object"), Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = default;
-        [SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
-        [SerializeField, Title("Pooling")] private bool collectionChecks = true;
-        [SerializeField] private int defaultCapacity = 10;
-        [SerializeField] private int maxSize = 10_000;
-        private Dictionary<AudioKey, AudioEffectSet> setLink = default;
-        private Dictionary<AudioKey, AudioEffect> prefabLink = default;
-        private Dictionary<AudioKey, List<AudioEffect>> effectLink = default;
-#endif
+		public AudioMixer mixer = null;
+
+		[SerializeField] private AudioEffectSet[] sets = default;
+		[SerializeField] private AudioEffectData[] data = default;
+
+		[SerializeField, Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = default;
+		[SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
+
+		[SerializeField] private bool collectionChecks = true;
+		[SerializeField, Min(0)] private int defaultCapacity = 10;
+		[SerializeField, Min(1)] private int maxSize = 10_000;
+
+		private Dictionary<AudioKey, AudioEffectSet> setLink = default;
+		private Dictionary<AudioKey, AudioEffect> prefabLink = default;
+		private Dictionary<AudioKey, List<AudioEffect>> effectLink = default;
 		private ObjectPool<AudioEffect> effectPool = default;
 
-		private IEnumerable<AudioEffectData> AllData => Foundation.Extensions.Join(sets.FlatMap(s => s.data), data);
+		private IEnumerable<AudioEffectData> AllData => Extensions.Join(sets.FlatMap(s => s.data), data);
+
+		// MARK: - Lifecycle
 
 		protected override void Awake() {
 			base.Awake();
@@ -86,6 +76,8 @@ namespace AudioTag {
 			);
 		}
 
+		// MARK: -
+
 		private AudioEffect CreatePrefab(in AudioEffectData data) {
 			AudioEffect prefab = data.prefabOverride == null ? sourcePrefab : data.prefabOverride;
 			AudioEffect e = Instantiate(prefab);
@@ -99,7 +91,7 @@ namespace AudioTag {
 		private AudioEffect GetInstance(in AudioKey key) {
 			if (Shared.effectLink.TryGetValue(key, out List<AudioEffect> effects)) {
 				if (effects.Count > 0) {
-					return Foundation.Extensions.First(effects, e => e.Active && (!e.Playing || e.IsVirtual));
+					return Extensions.First(effects, e => e.Active && (!e.Playing || e.IsVirtual));
 				}
 
 				AudioEffect result = Instantiate(Shared.prefabLink[key]);

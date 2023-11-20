@@ -39,14 +39,13 @@ namespace AudioTag.Editor {
 			Rect pickerRect = new Rect(position.x + consumed, position.y, PICKER_WIDTH, position.height);
 
 			// Draw
-			switch (mode) {
-				case Mode.Value:
-					EditorGUI.PropertyField(valueRect, valueProperty, GUIContent.none);
-					break;
-				case Mode.Reference:
-					EditorGUI.PropertyField(valueRect, referenceProperty, GUIContent.none);
-					break;
-			}
+
+			SerializedProperty drawnProperty = mode switch {
+				Mode.Value => valueProperty,
+				Mode.Reference => referenceProperty,
+				_ => null
+			};
+			EditorGUI.PropertyField(valueRect, drawnProperty, GUIContent.none);
 
 			if (menuContent == null) {
 				Texture2D icon = EditorGUIUtility.FindTexture("_Menu");
