@@ -9,7 +9,7 @@ namespace AudioTag {
 		[SerializeField] private AudioKeyReference _reference;
 		[SerializeField] private string _value;
 
-		public readonly string key => _reference.key ?? _value;
+		public readonly string key => _reference?.key ?? _value;
 
 		public AudioKey(AudioKeyReference key) {
 			_reference = key;
