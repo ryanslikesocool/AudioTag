@@ -167,8 +167,11 @@ namespace AudioTag {
 			return result;
 		}
 
-		public static AudioEffect Play(in AudioEffectData data, bool autoReturn = true) {
-			AudioEffect result = Peek(data)?.Play();
+		public static AudioEffect Play(in AudioEffectData data, bool autoReturn = true)
+			=> Play(Peek(data), autoReturn);
+
+		public static AudioEffect Play(in AudioEffect effect, bool autoReturn = true) {
+			AudioEffect result = effect?.Play();
 
 			if (autoReturn && result?.ActiveClip != null) {
 				CKClock.Delay(seconds: result.ActiveClip.length * result.ActivePitch, () => Return(result));

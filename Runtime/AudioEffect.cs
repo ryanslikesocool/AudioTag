@@ -143,7 +143,7 @@ namespace AudioTag {
 		/// <param name="value">The pitch of the AudioEffect.</param>
 		public AudioEffect SetPitch(float value) {
 			source.pitch = Mathf.Clamp(value, -3, 3);
-			overrideVolume = false;
+			overridePitch = true;
 			return this;
 		}
 

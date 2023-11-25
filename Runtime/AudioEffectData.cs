@@ -70,6 +70,9 @@ namespace AudioTag {
 
 		public float Duration => clips.Max(clip => clip.length);
 
+		public float GetPitch()
+			=> randomPitch ? UnityEngine.Random.Range(pitchRange.x, pitchRange.y) : fixedPitch;
+
 		public void Load() {
 			foreach (AudioClip clip in clips) {
 				if (clip.loadState == AudioDataLoadState.Unloaded) {
