@@ -9,8 +9,8 @@ using ClockKit;
 using Sirenix.OdinInspector;
 
 namespace AudioTag {
-	[DisallowMultipleComponent]
-	public sealed partial class AudioPool : Singleton<AudioPool> {
+	[DisallowMultipleComponent, Singleton(Persistent = true)]
+	public sealed partial class AudioPool : MonoBehaviour {
 		public AudioMixer mixer = null;
 
 		[Title("Data")]
@@ -35,9 +35,7 @@ namespace AudioTag {
 
 		// MARK: - Lifecycle
 
-		protected override void Awake() {
-			base.Awake();
-
+		private void Awake() {
 			foreach (AudioEffectSet set in sets) {
 				if (set.loadOnLaunch) {
 					set.Load();
@@ -78,6 +76,10 @@ namespace AudioTag {
 				defaultCapacity: defaultCapacity,
 				maxSize: maxSize
 			);
+		}
+
+		private void OnDestroy() {
+			DeinitializeSingleton();
 		}
 
 		// MARK: -

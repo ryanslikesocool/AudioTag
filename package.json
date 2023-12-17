@@ -1,11 +1,11 @@
 {
   "name": "com.developedwithlove.audiotag",
   "displayName": "AudioTag",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "unity": "2021.3",
   "description": "Tag/ID based audio system for Unity.",
   "documentationUrl": "https://github.com/ryanslikesocool/AudioTag",
-	"licenseUrl": "https://github.com/ryanslikesocool/AudioTag/blob/main/LICENSE.md",
+  "licenseUrl": "https://github.com/ryanslikesocool/AudioTag/blob/main/LICENSE.md",
   "author": {
     "name": "Ryan Boyer",
     "email": "ryanjboyer@gmail.com",
@@ -14,7 +14,8 @@
   "type": "library",
   "dependencies": {
     "com.unity.modules.audio": "1.0.0",
+    "com.developedwithlove.clockkit": "2.3.3",
     "com.developedwithlove.foundation": "0.1.0-pre.1",
-    "com.developedwithlove.clockkit": "1.6.0"
+    "com.developedwithlove.foundation.generators": "0.1.0-pre.1"
   }
 }
