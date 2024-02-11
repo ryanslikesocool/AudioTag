@@ -9,6 +9,10 @@ using ClockKit;
 using Sirenix.OdinInspector;
 
 namespace AudioTag {
+	/// <summary>
+	/// The primary object managing all AudioEffects.
+	/// </summary>
+	/// <seealso cref="AudioEffect"/>
 	[DisallowMultipleComponent, Singleton(Persistent = true)]
 	public sealed partial class AudioPool : MonoBehaviour {
 		public AudioMixer mixer = null;
@@ -113,20 +117,54 @@ namespace AudioTag {
 		}
 
 		/// <summary>
-		/// Peek the next available AudioEffect with the defined key.
+		/// Peek the next available <see cref="AudioEffect"/> with the given key.
 		/// </summary>
 		/// <param name="key">The key to look for.</param>
-		/// <returns>The AudioEffect with the defined key, if one was found.</returns>
+		/// <returns>The <see c=> with the given <paramref name="key"/>, if one was found.</returns>
 		public static AudioEffect Peek(in AudioKey key)
 			=> Shared.GetInstance(key);
 
 		/// <summary>
-		/// Play the next available AudioEffect with the defined key.
+		/// </summary>
+
+		/// <summary>
+		/// Attempt to peek the next available <see cref="AudioEffect"/> with the given key.
 		/// </summary>
 		/// <param name="key">The key to look for.</param>
-		/// <returns>The AudioEffect with the defined key, if one was found.</returns>
-		public static AudioEffect Play(in AudioKey key)
-			=> Peek(key)?.Play();
+		/// <param name="effect">The <see cref="AudioEffect"/> with the given <paramref name="key"/>, if one was found.</param>
+		/// <returns><see langword="true"/> if the <paramref name="effect"/> was found; <see langword="false"/> otherwise.</returns>
+		public static bool TryPeek(in AudioKey key, out AudioEffect effect) {
+			effect = Peek(key);
+			return effect != null;
+		}
+
+		/// <summary>
+		/// Play the next available <see cref="AudioEffect"/> with the given key.
+		/// </summary>
+		/// <param name="key">The key to look for.</param>
+		/// <returns>The <see cref="AudioEffect"/> with the given <paramref name="key"/>, if one was found.</returns>
+		public static AudioEffect Play(in AudioKey key) {
+			if (TryPlay(key, out AudioEffect effect)) {
+				return effect;
+			} else {
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Play the next available <see cref="AudioEffect"/> with the given key.
+		/// </summary>
+		/// <param name="key">The key to look for.</param>
+		/// <returns>The <see cref="AudioEffect"/> with the given <paramref name="key"/>, if one was found.</returns>
+		/// <returns><see langword="true"/> if the <paramref name="effect"/> was found; <see langword="false"/> otherwise.</returns>
+		public static bool TryPlay(in AudioKey key, out AudioEffect effect) {
+			if (TryPeek(key, out effect)) {
+				effect.Play();
+				return true;
+			} else {
+				return false;
+			}
+		}
 
 		public static void SetMixerVolume(in string name, in float percent) {
 			if (percent == 0) {

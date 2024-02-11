@@ -6,6 +6,10 @@ using Sirenix.OdinInspector;
 #endif
 
 namespace AudioTag {
+	/// <summary>
+	/// An object grouping multiple AudioEffectData.
+	/// </summary>
+	/// <seealso cref="AudioEffectData"/>
 	[CreateAssetMenu(menuName = "Developed With Love/AudioTag/Audio Effect Set")]
 	public sealed class AudioEffectSet : ScriptableObject {
 #if ODIN_INSPECTOR_3

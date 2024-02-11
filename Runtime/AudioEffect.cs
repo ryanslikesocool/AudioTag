@@ -7,6 +7,10 @@ using Sirenix.OdinInspector;
 #endif
 
 namespace AudioTag {
+	/// <summary>
+	/// The runtime object the plays data provided by AudioEffectData.
+	/// </summary>
+	/// <seealso cref="AudioEffectData"/>
 	[RequireComponent(typeof(AudioSource))]
 	public class AudioEffect : MonoBehaviour {
 		internal AudioEffectData data = null;
