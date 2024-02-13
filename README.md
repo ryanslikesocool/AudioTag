@@ -2,16 +2,14 @@
 Tag/ID-based audio system for Unity
 
 ## NOTICE
-AudioTag is not considered production-ready.  Breaking changes are common and support is limited.  Use at your own risk.
+This package is not considered production-ready.  Breaking changes are common and support is limited.  Use at your own risk.
 
-## Installation
-**Recommended Installation** (Unity Package Manager)
-- "Add package from git URL..."
-- `https://github.com/ryanslikesocool/AudioTag.git`
-
-**Alternate Installation** (not recommended)
-- Get the latest [release](https://github.com/ryanslikesocool/AudioTag/releases)
-- Import into your project's Plugins folder
+## Installation (Unity Package Manager)
+- Select "Add package from git URL..." from the plus menu in the package manager window.
+- Paste the package's git url.
+```
+https://github.com/ryanslikesocool/AudioTag.git
+```
 
 ## Dependencies
 AudioTag has three dependencies:

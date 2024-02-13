@@ -18,6 +18,10 @@ namespace AudioTag {
 		public static void LoadSet(in AudioEffectSet set) => LoadSet(set.key);
 
 		public static AudioEffectSet LoadSet(in AudioKey key) {
+			if (Shared == null) {
+				return null;
+			}
+
 			if (Shared.setLink.TryGetValue(key, out AudioEffectSet set)) {
 				set.Load();
 				return set;
@@ -30,6 +34,10 @@ namespace AudioTag {
 		public static void UnloadSet(in AudioEffectSet set) => UnloadSet(set.key);
 
 		public static void UnloadSet(in AudioKey key) {
+			if (Shared == null) {
+				return;
+			}
+
 			if (Shared.setLink.TryGetValue(key, out AudioEffectSet set)) {
 				set.Unload();
 			} else {

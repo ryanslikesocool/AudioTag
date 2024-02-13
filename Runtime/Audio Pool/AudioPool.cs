@@ -125,9 +125,6 @@ namespace AudioTag {
 			=> Shared.GetInstance(key);
 
 		/// <summary>
-		/// </summary>
-
-		/// <summary>
 		/// Attempt to peek the next available <see cref="AudioEffect"/> with the given key.
 		/// </summary>
 		/// <param name="key">The key to look for.</param>
@@ -135,6 +132,11 @@ namespace AudioTag {
 		/// <returns><see langword="true"/> if the <paramref name="effect"/> was found; <see langword="false"/> otherwise.</returns>
 		public static bool TryPeek(in AudioKey key, out AudioEffect effect) {
 			effect = Peek(key);
+			return effect != null;
+		}
+
+		public static bool TryPeek(in AudioEffectData data, out AudioEffect effect) {
+			effect = Peek(data);
 			return effect != null;
 		}
 
@@ -159,6 +161,15 @@ namespace AudioTag {
 		/// <returns><see langword="true"/> if the <paramref name="effect"/> was found; <see langword="false"/> otherwise.</returns>
 		public static bool TryPlay(in AudioKey key, out AudioEffect effect) {
 			if (TryPeek(key, out effect)) {
+				effect.Play();
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		public static bool TryPlay(in AudioEffectData data, out AudioEffect effect) {
+			if (TryPeek(data, out effect)) {
 				effect.Play();
 				return true;
 			} else {
