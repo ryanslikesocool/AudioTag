@@ -12,7 +12,7 @@ https://github.com/ryanslikesocool/AudioTag.git
 ```
 
 ## Dependencies
-AudioTag has three dependencies:
+This package has three dependencies:
 - [Foundation](https://github.com/ryanslikesocool/UnityFoundation)
 - [ClockKit](https://github.com/ryanslikesocool/ClockKit)
 - [Unity Audio](https://docs.unity3d.com/2021.3/Documentation/ScriptReference/UnityEngine.AudioModule.html)
