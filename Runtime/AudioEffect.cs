@@ -20,7 +20,7 @@ namespace AudioTag {
 		public bool IsPlaying => source != null && source.isPlaying;
 
 		protected AudioSource source = null;
-		internal AudioSource Source => source;
+		public AudioSource Source => source;
 
 		private OverrideSourceAction overrideSource = null;
 
