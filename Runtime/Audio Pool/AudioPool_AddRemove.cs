@@ -22,7 +22,7 @@ namespace AudioTag {
 		private void AddEffect(in AudioEffectData data) {
 			AudioKey key = data.key;
 			if (prefabLink.ContainsKey(key)) {
-				Debug.LogError($"The audio key assigned to {data.name} already exists.  Please rekey one of these objects.  {data.name} will not be added to the link.");
+				Debug.LogErrorFormat(PreexistingAudioKeyFormat, data.name);
 				return;
 			}
 
@@ -44,5 +44,9 @@ namespace AudioTag {
 			effectLink.Remove(key);
 			prefabLink.Remove(key);
 		}
+
+		// MARK: - Constants
+
+		private const string PreexistingAudioKeyFormat = "The audio key assigned to {0} already exists.  Please rekey one of these objects.  {0} will not be added to the link";
 	}
 }

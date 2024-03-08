@@ -26,7 +26,7 @@ namespace AudioTag {
 				set.Load();
 				return set;
 			} else {
-				Debug.LogWarning($"AudioEffectSet with key '{key.key}' does not exist.");
+				Debug.LogWarningFormat(MissingAudioEffectSetFormat, key.key);
 				return null;
 			}
 		}
@@ -41,8 +41,12 @@ namespace AudioTag {
 			if (Shared.setLink.TryGetValue(key, out AudioEffectSet set)) {
 				set.Unload();
 			} else {
-				Debug.LogWarning($"AudioEffectSet with key '{key.key}' does not exist.");
+				Debug.LogWarningFormat(MissingAudioEffectSetFormat, key.key);
 			}
 		}
+
+		// MARK: - Constants
+
+		private const string MissingAudioEffectSetFormat = "AudioEffectSet with key '{0}' does not exist.";
 	}
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Pool;
 using ClockKit;
-using Sirenix.OdinInspector;
+using System.Linq;
 
 namespace AudioTag {
 	/// <summary>
@@ -17,25 +17,22 @@ namespace AudioTag {
 	public sealed partial class AudioPool : MonoBehaviour {
 		public AudioMixer mixer = null;
 
-		[Title("Data")]
 		[SerializeField] private AudioEffectSet[] sets = default;
 		[SerializeField] private AudioEffectData[] data = default;
 
-		[Title("Object")]
 		[SerializeField, Tooltip("The prefab to use by default when creating audio sources.  This cannot be empty.  Assign this to the prefab included in the package folder if a custom one is not needed.")] private AudioEffect sourcePrefab = default;
 		[SerializeField, Tooltip("Mark instantiated AudioEffect objects with this hide flag.")] private HideFlags effectHideFlags = HideFlags.HideAndDontSave;
 
-		[Title("Pool")]
 		[SerializeField] private bool collectionChecks = true;
 		[SerializeField, Min(0)] private int defaultCapacity = 10;
 		[SerializeField, Min(1)] private int maxSize = 10_000;
 
-		[ShowInInspector, ReadOnly] private Dictionary<string, AudioEffectSet> setLink = default;
-		[ShowInInspector, ReadOnly] private Dictionary<string, AudioEffect> prefabLink = default;
-		[ShowInInspector, ReadOnly] private Dictionary<string, List<AudioEffect>> effectLink = default;
+		private Dictionary<string, AudioEffectSet> setLink = default;
+		private Dictionary<string, AudioEffect> prefabLink = default;
+		private Dictionary<string, List<AudioEffect>> effectLink = default;
 		private ObjectPool<AudioEffect> effectPool = default;
 
-		private IEnumerable<AudioEffectData> AllData => Extensions.Join(sets.FlatMap(s => s.data), data);
+		private IEnumerable<AudioEffectData> AllData => sets.FlatMap(s => s.data).Join(data);
 
 		// MARK: - Lifecycle
 
@@ -101,7 +98,7 @@ namespace AudioTag {
 		private AudioEffect GetInstance(in AudioKey key) {
 			if (Shared.effectLink.TryGetValue(key, out List<AudioEffect> effects)) {
 				if (effects.Count > 0) {
-					return Extensions.First(effects, e => e.Active && (!e.Playing || e.IsVirtual));
+					return effects.First(e => e.IsActive && (!e.IsPlaying || e.data.isVirtual));
 				}
 
 				AudioEffect result = Instantiate(Shared.prefabLink[key]);
@@ -208,7 +205,7 @@ namespace AudioTag {
 
 		public static AudioEffect Peek(in AudioEffectData data) {
 			if (data == null) {
-				return null;
+				throw new System.NullReferenceException();
 			}
 
 			AudioEffect result = Shared.effectPool.Get();
@@ -222,10 +219,13 @@ namespace AudioTag {
 			=> Play(Peek(data), autoReturn);
 
 		public static AudioEffect Play(in AudioEffect effect, bool autoReturn = true) {
-			AudioEffect result = effect?.Play();
+			if (effect == null) {
+				throw new System.NullReferenceException();
+			}
+			AudioEffect result = effect.Play();
 
-			if (autoReturn && result?.ActiveClip != null) {
-				CKClock.Delay(seconds: result.ActiveClip.length * result.ActivePitch, () => Return(result));
+			if (autoReturn && result.Source.clip != null) {
+				CKClock.Delay(seconds: result.Source.clip.length * result.Source.pitch, () => Return(result));
 			}
 			return result;
 		}

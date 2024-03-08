@@ -1,55 +1,34 @@
 // Developed With Love by Ryan Boyer http://ryanjboyer.com <3
 
-using System;
 using UnityEngine;
-#if ODIN_INSPECTOR_3
-using Sirenix.OdinInspector;
-#endif
 
 namespace AudioTag {
 	/// <summary>
 	/// The runtime object the plays data provided by AudioEffectData.
 	/// </summary>
 	/// <seealso cref="AudioEffectData"/>
-	[RequireComponent(typeof(AudioSource))]
+	[RequireComponent(typeof(AudioSource)), DisallowMultipleComponent]
 	public class AudioEffect : MonoBehaviour {
+		public delegate void OverrideSourceAction(AudioSource source);
+
 		internal AudioEffectData data = null;
 		protected int clipIndex = 0;
 		public AudioEffectData Data => data;
 
-#if ODIN_INSPECTOR_3
-		[BoxGroup("Info"), ShowInInspector, ReadOnly] public AudioKey key => data?.key ?? default;
-		[HorizontalGroup("Info/H1"), ToggleLeft, ShowInInspector, ReadOnly] public bool Active => gameObject.activeInHierarchy;
-		[HorizontalGroup("Info/H1"), ToggleLeft, ShowInInspector, ReadOnly] public bool Playing => source == null ? false : source.isPlaying;
-#else
-        public AudioKey.Runtime key => data.key;
-        public bool Active => gameObject.activeInHierarchy;
-        public bool Playing => source == null ? false : source.isPlaying;
-#endif
-		public AudioClip ActiveClip => source.clip;
-		public float ActivePitch => source.pitch;
+		public AudioKey Key => data == null ? default : data.key;
+		public bool IsActive => gameObject.activeInHierarchy;
+		public bool IsPlaying => source != null && source.isPlaying;
 
-		[SerializeField] protected AudioSource source = null;
+		protected AudioSource source = null;
+		internal AudioSource Source => source;
 
-		public bool IsVirtual => data.isVirtual;
-		protected bool Loop => data.loop;
-		protected AudioClip[] Clips => data.clips;
-		protected bool RandomClip => data.randomClip;
-		protected bool RandomPitch => data.randomPitch;
-		protected Vector2 PitchRange => data.pitchRange;
-		protected float FixedPitch => data.fixedPitch;
-		protected float SpatialBlend => data.spatialBlend;
-		protected float ReverbZoneMix => data.reverbZoneMix;
-		protected float DopplerLevel => data.dopplerLevel;
-		protected float Spread => data.spread;
-		protected float MinDistance => data.minDistance;
-		protected float MaxDistance => data.maxDistance;
+		private OverrideSourceAction overrideSource = null;
 
-		private bool overrideAny = false;
-		private bool overrideClipIndex = false;
-		private bool overrideVolume = false;
-		private bool overridePitch = false;
-		private bool override3D = false;
+		// MARK: - Lifecycle
+
+		private void Awake() {
+			source = GetComponent<AudioSource>();
+		}
 
 		public void Init(AudioEffectData data) {
 			this.data = data;
@@ -62,53 +41,59 @@ namespace AudioTag {
 			gameObject.SetActive(false);
 		}
 
+		// MARK: -
+
 		/// <summary>
 		/// Plays the audio clip with the defined settings.
 		/// </summary>
 		public AudioEffect Play() {
-			if (!overrideAny) {
-				source.loop = Loop;
-
-				if (!overrideClipIndex) {
-					if (Clips.Length > 1 && RandomClip) {
-						clipIndex = UnityEngine.Random.Range(0, Clips.Length);
-					}
-				}
-				if (!overridePitch) {
-					if (RandomPitch) {
-						source.pitch = UnityEngine.Random.Range(PitchRange.x, PitchRange.y);
-					} else {
-						source.pitch = FixedPitch;
-					}
-				}
-				if (!overrideVolume) {
-					source.volume = data.volume;
-				}
-				if (!override3D) {
-					source.spatialBlend = SpatialBlend;
-					source.dopplerLevel = DopplerLevel;
-					source.spread = Spread;
-					source.minDistance = MinDistance;
-					source.maxDistance = MaxDistance;
-				}
+			if (source == null) {
+				Debug.LogError($"Attamped to play an audio effect with no Audio Source.");
 			}
+			if (data == null) {
+				Debug.LogError($"Attamped to play an audio effect with no Audio Effect Data.");
+			}
+			if (data.clips.Length == 0) {
+				Debug.LogError($"Attamped to play audio effect '{Key.key}' with no clips.");
+			}
+
+			source.loop = data.loop;
+			source.volume = data.volume;
+			source.priority = data.priority;
+
+			if (data.clips.Length > 1 && data.randomClip) {
+				clipIndex = UnityEngine.Random.Range(0, data.clips.Length);
+			}
+
+			if (data.randomPitch) {
+				source.pitch = UnityEngine.Random.Range(data.pitchRange.x, data.pitchRange.y);
+			} else {
+				source.pitch = data.fixedPitch;
+			}
+
+			source.spatialBlend = data.spatialBlend;
+			source.dopplerLevel = data.dopplerLevel;
+			source.spread = data.spread;
+			source.minDistance = data.minDistance;
+			source.maxDistance = data.maxDistance;
 
 			if (data.mixerGroup != null) {
 				source.outputAudioMixerGroup = data.mixerGroup;
 			}
 
-			if (IsVirtual) {
-				source.PlayOneShot(Clips[clipIndex]);
+			if (!data.isVirtual) {
+				source.clip = data.clips[clipIndex];
+			}
+
+			overrideSource?.Invoke(source);
+
+			if (data.isVirtual) {
+				source.PlayOneShot(data.clips[clipIndex]);
 			} else {
-				source.clip = Clips[clipIndex];
 				source.Play();
 			}
 
-			overrideAny = false;
-			overrideClipIndex = false;
-			overrideVolume = false;
-			overridePitch = false;
-			override3D = false;
+			overrideSource = default;
 
 			return this;
 		}
@@ -117,15 +102,18 @@ namespace AudioTag {
 		/// Overrides the clip index of the AudioEffect.
 		/// This setting will be in place until the next call to Play().
 		/// </summary>
-		/// <param name="value">The index of the clip to play.</param>
-		public AudioEffect SetClipIndex(int value) {
-			if (value < 0 || value >= Clips.Length) {
-				clipIndex = 0;
-				Debug.LogWarning($"The desired clip index ({value}) is out of range 0 ..< {Clips.Length} on AudioEffect with name '{gameObject.name}' with key '{key}'.  The clip index will be set to 0.");
+		/// <param name="clipIndex">The index of the clip to play.</param>
+		public AudioEffect SetClipIndex(int clipIndex) {
+			int index;
+			if (clipIndex < 0 || clipIndex >= data.clips.Length) {
+				index = 0;
+				Debug.LogWarning($"The desired clip index ({clipIndex}) is out of range 0 ..< {data.clips.Length} on AudioEffect with name '{gameObject.name}' with key '{Key}'.  The clip index will be set to 0.");
 			} else {
-				clipIndex = value;
+				index = clipIndex;
 			}
-			overrideClipIndex = true;
+			overrideSource += (source) => {
+				source.clip = data.clips[index];
+			};
 			return this;
 		}
 
@@ -135,8 +123,9 @@ namespace AudioTag {
 		/// </summary>
 		/// <param name="value">The volume of the AudioEffect.</param>
 		public AudioEffect SetVolume(float value) {
-			source.volume = Mathf.Clamp01(value);
-			overrideVolume = true;
+			overrideSource += (source) => {
+				source.volume = Mathf.Clamp01(value);
+			};
 			return this;
 		}
 
@@ -144,10 +133,11 @@ namespace AudioTag {
 		/// Overrides the pitch of the AudioEffect, clamped between -3 and 3.
 		/// This setting will be in place until the next call to Play().
 		/// </summary>
-		/// <param name="value">The pitch of the AudioEffect.</param>
-		public AudioEffect SetPitch(float value) {
-			source.pitch = Mathf.Clamp(value, -3, 3);
-			overridePitch = true;
+		/// <param name="pitch">The pitch of the AudioEffect.</param>
+		public AudioEffect SetPitch(float pitch) {
+			overrideSource += (source) => {
+				source.pitch = Mathf.Clamp(pitch, -3, 3);
+			};
 			return this;
 		}
 
@@ -155,7 +145,7 @@ namespace AudioTag {
 		/// Sets the world position of the AuidoEffect.
 		/// Useful for spatial audio.
 		/// </summary>
-		/// <param name="value">The world position of the AudioEffect.</param>
+		/// <param name="position">The world position of the AudioEffect.</param>
 		public AudioEffect SetPosition(Vector3 position) {
 			transform.position = position;
 			return this;
@@ -165,10 +155,8 @@ namespace AudioTag {
 		/// Openly modify the AudioSource attached to this AudioEffect.
 		/// Any settings applied will be in place until the next call to Play().
 		/// </summary>
-		/// <param name="value">The pitch of the AudioEffect.</param>
-		public AudioEffect ModifySource(Action<AudioSource> action) {
-			action(source);
-			overrideAny = true;
+		public AudioEffect OverrideSource(OverrideSourceAction action) {
+			overrideSource += action;
 			return this;
 		}
 
