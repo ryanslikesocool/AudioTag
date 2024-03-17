@@ -33,7 +33,13 @@ namespace AudioTag {
 		public float maxDistance = 500;
 
 		public bool RequiresLoading => clips.Any(clip => clip != null ? !clip.preloadAudioData : false);
-		public LoadState LoadState => clips.Reduce(LoadState.None, (result, element) => result | element.loadState.ToAudioTag());
+		public LoadState LoadState => clips.Reduce(LoadState.None, (result, element) => {
+			if (element != null) {
+				return result | element.loadState.ToAudioTag();
+			} else {
+				return result;
+			}
+		});
 
 		public float MaxDuration => clips.Max(clip => clip.length);
 
