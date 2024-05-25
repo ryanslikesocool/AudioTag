@@ -13,7 +13,7 @@ namespace AudioTag {
 	/// The primary object managing all AudioEffects.
 	/// </summary>
 	/// <seealso cref="AudioEffect"/>
-	[DisallowMultipleComponent, Singleton(Persistent = true)]
+	[DisallowMultipleComponent, SingletonComponent(Persistent = true)]
 	public sealed partial class AudioPool : MonoBehaviour {
 		public AudioMixer mixer = null;
 

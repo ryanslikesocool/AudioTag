@@ -8,7 +8,7 @@ namespace AudioTag {
 	/// </summary>
 	/// <seealso cref="AudioEffectData"/>
 	[RequireComponent(typeof(AudioSource)), DisallowMultipleComponent]
-	public class AudioEffect : MonoBehaviour {
+	public partial class AudioEffect : MonoBehaviour {
 		public delegate void OverrideSourceAction(AudioSource source);
 
 		internal AudioEffectData data = null;
@@ -19,15 +19,14 @@ namespace AudioTag {
 		public bool IsActive => gameObject.activeInHierarchy;
 		public bool IsPlaying => source != null && source.isPlaying;
 
-		protected AudioSource source = null;
-		public AudioSource Source => source;
+		[AutoProperty, GetComponent] protected AudioSource source = null;
 
 		private OverrideSourceAction overrideSource = null;
 
 		// MARK: - Lifecycle
 
 		private void Awake() {
-			source = GetComponent<AudioSource>();
+			InitializeComponents();
 		}
 
 		public void Init(AudioEffectData data) {
