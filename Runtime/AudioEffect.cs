@@ -1,4 +1,4 @@
-// Developed With Love by Ryan Boyer http://ryanjboyer.com <3
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 using UnityEngine;
 
@@ -19,7 +19,7 @@ namespace AudioTag {
 		public bool IsActive => gameObject.activeInHierarchy;
 		public bool IsPlaying => source != null && source.isPlaying;
 
-		[AutoProperty, GetComponent] protected AudioSource source = null;
+		[Get, GetComponent] protected AudioSource source = null;
 
 		private OverrideSourceAction overrideSource = null;
 
