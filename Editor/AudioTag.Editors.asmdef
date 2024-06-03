@@ -2,7 +2,8 @@
     "name": "AudioTag.Editors",
     "rootNamespace": "AudioTag.Editors",
     "references": [
-        "GUID:e71646fcf745d49f899078092f217ff2"
+        "GUID:e71646fcf745d49f899078092f217ff2",
+        "GUID:2305d81fae9c94c1294cc7e76272c158"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

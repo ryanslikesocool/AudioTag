@@ -1,12 +1,13 @@
-// Developed With Love by Ryan Boyer http://ryanjboyer.com <3
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using Foundation.Editors;
 
 namespace AudioTag.Editors {
 	[CustomEditor(typeof(AudioPool))]
-	public sealed class AudioPoolEditor : UnityEditor.Editor {
+	internal sealed class AudioPoolEditor : UnityEditor.Editor {
 		private SerializedProperty mixer;
 
 		private SerializedProperty sets;
@@ -20,17 +21,17 @@ namespace AudioTag.Editors {
 		private SerializedProperty maxSize;
 
 		public void OnEnable() {
-			mixer = serializedObject.FindProperty("mixer");
+			mixer = serializedObject.FindProperty(Properties.MIXER);
 
-			sets = serializedObject.FindProperty("sets");
-			data = serializedObject.FindProperty("data");
+			sets = serializedObject.FindProperty(Properties.SETS);
+			data = serializedObject.FindProperty(Properties.DATA);
 
-			sourcePrefab = serializedObject.FindProperty("sourcePrefab");
-			effectHideFlags = serializedObject.FindProperty("effectHideFlags");
+			sourcePrefab = serializedObject.FindProperty(Properties.SOURCE_PREFAB);
+			effectHideFlags = serializedObject.FindProperty(Properties.EFFECT_HIDE_FLAGS);
 
-			collectionChecks = serializedObject.FindProperty("collectionChecks");
-			defaultCapacity = serializedObject.FindProperty("defaultCapacity");
-			maxSize = serializedObject.FindProperty("maxSize");
+			collectionChecks = serializedObject.FindProperty(Properties.COLLECTION_CHECKS);
+			defaultCapacity = serializedObject.FindProperty(Properties.DEFAULT_CAPACITY);
+			maxSize = serializedObject.FindProperty(Properties.MAX_SIZE);
 		}
 
 		public override void OnInspectorGUI() {
@@ -47,27 +48,27 @@ namespace AudioTag.Editors {
 		// MARK: - GUI
 
 		private void GeneralGUI() {
-			using (new GroupBox()) {
+			using (new BoxGroupScope()) {
 				EditorGUILayout.PropertyField(mixer, Styles.mixer);
 			}
 		}
 
 		private void DataGUI() {
-			using (new GroupBox("Data")) {
+			using (new BoxGroupScope(Strings.DATA)) {
 				EditorGUILayout.PropertyField(sets, Styles.sets);
 				EditorGUILayout.PropertyField(data, Styles.data);
 			}
 		}
 
 		private void ObjectGUI() {
-			using (new GroupBox("Object")) {
+			using (new BoxGroupScope(Strings.OBJECT)) {
 				EditorGUILayout.PropertyField(sourcePrefab, Styles.sourcePrefab);
 				EditorGUILayout.PropertyField(effectHideFlags, Styles.effectHideFlags);
 			}
 		}
 
 		private void PoolGUI() {
-			using (new GroupBox("Pool")) {
+			using (new BoxGroupScope(Strings.POOL)) {
 				EditorGUILayout.PropertyField(collectionChecks, Styles.collectionChecks);
 				EditorGUILayout.PropertyField(defaultCapacity, Styles.defaultCapacity);
 				EditorGUILayout.PropertyField(maxSize, Styles.maxSize);
@@ -76,18 +77,38 @@ namespace AudioTag.Editors {
 
 		// MARK: - Styles
 
-		private static class Styles {
-			internal static readonly GUIContent mixer = new GUIContent("Mixer");
+		internal static class Properties {
+			public const string MIXER = "mixer";
 
-			internal static readonly GUIContent sets = new GUIContent("Sets");
-			internal static readonly GUIContent data = new GUIContent("Data");
+			public const string SETS = "sets";
+			public const string DATA = "data";
 
-			internal static readonly GUIContent sourcePrefab = new GUIContent("Source Prefab");
-			internal static readonly GUIContent effectHideFlags = new GUIContent("Effect Hide Flags");
+			public const string SOURCE_PREFAB = "sourcePrefab";
+			public const string EFFECT_HIDE_FLAGS = "effectHideFlags";
 
-			internal static readonly GUIContent collectionChecks = new GUIContent("Collection Checks");
-			internal static readonly GUIContent defaultCapacity = new GUIContent("Default Capacity");
-			internal static readonly GUIContent maxSize = new GUIContent("Max Size");
+			public const string COLLECTION_CHECKS = "collectionChecks";
+			public const string DEFAULT_CAPACITY = "defaultCapacity";
+			public const string MAX_SIZE = "maxSize";
+		}
+
+		internal static class Strings {
+			public const string DATA = "Data";
+			public const string OBJECT = "Object";
+			public const string POOL = "Pool";
+		}
+
+		internal static class Styles {
+			public static readonly GUIContent mixer = new GUIContent("Mixer");
+
+			public static readonly GUIContent sets = new GUIContent("Sets");
+			public static readonly GUIContent data = new GUIContent("Data");
+
+			public static readonly GUIContent sourcePrefab = new GUIContent("Source Prefab");
+			public static readonly GUIContent effectHideFlags = new GUIContent("Effect Hide Flags");
+
+			public static readonly GUIContent collectionChecks = new GUIContent("Collection Checks");
+			public static readonly GUIContent defaultCapacity = new GUIContent("Default Capacity");
+			public static readonly GUIContent maxSize = new GUIContent("Max Size");
 		}
 	}
 }

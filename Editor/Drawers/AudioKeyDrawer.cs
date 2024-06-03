@@ -1,4 +1,4 @@
-// Developed With Love by Ryan Boyer http://ryanjboyer.com <3
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -19,8 +19,8 @@ namespace AudioTag.Editor {
 		private GUIContent menuContent = null;
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-			SerializedProperty referenceProperty = property.FindPropertyRelative("_reference");
-			SerializedProperty valueProperty = property.FindPropertyRelative("_value");
+			SerializedProperty referenceProperty = property.FindPropertyRelative(Properties.REFERENCE);
+			SerializedProperty valueProperty = property.FindPropertyRelative(Properties.VALUE);
 
 			if (mode == (Mode)byte.MaxValue) {
 				mode = referenceProperty.objectReferenceValue == null ? Mode.Value : Mode.Reference;
@@ -50,14 +50,14 @@ namespace AudioTag.Editor {
 			EditorGUI.PropertyField(valueRect, drawnProperty, GUIContent.none);
 
 			if (menuContent == null) {
-				Texture2D icon = EditorGUIUtility.FindTexture("_Menu");
+				Texture2D icon = EditorGUIUtility.FindTexture(Styles.MENU);
 				menuContent = new GUIContent(icon);
 			}
 
 			if (EditorGUI.DropdownButton(pickerRect, menuContent, FocusType.Passive, EditorStyles.iconButton)) { // menu
 				GenericMenu menu = new GenericMenu();
-				menu.AddItem(new GUIContent("Value"), mode == Mode.Value, () => mode = Mode.Value);
-				menu.AddItem(new GUIContent("Reference"), mode == Mode.Reference, () => mode = Mode.Reference);
+				menu.AddItem(new GUIContent(Styles.Value), mode == Mode.Value, () => mode = Mode.Value);
+				menu.AddItem(new GUIContent(Styles.Reference), mode == Mode.Reference, () => mode = Mode.Reference);
 				menu.ShowAsContext();
 			}
 
@@ -65,6 +65,20 @@ namespace AudioTag.Editor {
 			EditorGUI.indentLevel = indent;
 
 			EditorGUI.EndProperty();
+		}
+
+		// MARK: - Constants
+
+		internal static class Properties {
+			public const string REFERENCE = "_reference";
+			public const string VALUE = "_value";
+		}
+
+		internal static class Styles {
+			public static readonly GUIContent Value = new GUIContent("Value");
+			public static readonly GUIContent Reference = new GUIContent("Reference");
+
+			public const string MENU = "_Menu";
 		}
 	}
 }
