@@ -31,7 +31,7 @@ namespace AudioTag {
 
 		public void Init(AudioEffectData data) {
 			this.data = data;
-			this.clipIndex = 0;
+			this.clipIndex = data.clipIndex;
 			gameObject.SetActive(true);
 		}
 
@@ -106,7 +106,7 @@ namespace AudioTag {
 			int index;
 			if (clipIndex < 0 || clipIndex >= data.clips.Length) {
 				index = 0;
-				Debug.LogWarning($"The desired clip index ({clipIndex}) is out of range 0 ..< {data.clips.Length} on AudioEffect with name '{gameObject.name}' with key '{Key}'.  The clip index will be set to 0.");
+				Debug.LogWarning($"The desired clip index ({clipIndex}) is out of the range [0 ..< {data.clips.Length}] on AudioEffect with name '{gameObject.name}' with key '{Key}'.  The clip index will be set to 0.");
 			} else {
 				index = clipIndex;
 			}
