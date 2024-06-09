@@ -47,13 +47,13 @@ namespace AudioTag {
 		/// </summary>
 		public AudioEffect Play() {
 			if (source == null) {
-				Debug.LogError($"Attamped to play an audio effect with no Audio Source.");
+				Debug.LogError($"Attemped to play an audio effect with no Audio Source.");
 			}
 			if (data == null) {
-				Debug.LogError($"Attamped to play an audio effect with no Audio Effect Data.");
+				Debug.LogError($"Attemped to play an audio effect with no Audio Effect Data.");
 			}
 			if (data.clips.Length == 0) {
-				Debug.LogError($"Attamped to play audio effect '{Key.key}' with no clips.");
+				Debug.LogError($"Attemped to play audio effect '{Key.key}' with no clips.");
 			}
 
 			source.loop = data.loop;
