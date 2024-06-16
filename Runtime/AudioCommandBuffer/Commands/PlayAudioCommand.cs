@@ -3,30 +3,32 @@
 using Foundation;
 
 namespace AudioTag {
-	public readonly struct PlayAudioCommand : IAudioCommand_Play {
-		public delegate float DelayProvider();
+	public static partial class AudioCommand {
+		public readonly struct Play : IAudioCommand_Play {
+			public delegate float DelayProvider();
 
-		private readonly DelayProvider delayProvider;
+			private readonly DelayProvider delayProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public PlayAudioCommand(DelayProvider delayProvider = null) {
-			this.delayProvider = delayProvider;
-		}
+			public Play(DelayProvider delayProvider = null) {
+				this.delayProvider = delayProvider;
+			}
 
-		public PlayAudioCommand(float delay) : this(() => delay) { }
+			public Play(float delay) : this(() => delay) { }
 
-		public PlayAudioCommand(float minDelay, float maxDelay) : this(() => UnityEngine.Random.Range(minDelay, maxDelay)) { }
+			public Play(float minDelay, float maxDelay) : this(() => UnityEngine.Random.Range(minDelay, maxDelay)) { }
 
-		public PlayAudioCommand(ClosedRange<float> delayRange) : this(delayRange.lowerBound, delayRange.upperBound) { }
+			public Play(ClosedRange<float> delayRange) : this(delayRange.lowerBound, delayRange.upperBound) { }
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			if (delayProvider == null) {
-				context.Source.Play();
-			} else {
-				context.Source.PlayDelayed(delayProvider());
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				if (delayProvider == null) {
+					context.Source.Play();
+				} else {
+					context.Source.PlayDelayed(delayProvider());
+				}
 			}
 		}
 	}

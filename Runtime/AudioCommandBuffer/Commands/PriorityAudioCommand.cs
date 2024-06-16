@@ -1,26 +1,28 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that changes the value of <see cref="UnityEngine.AudioSource.priority"/>.
-	/// </summary>
-	public readonly struct PriorityAudioCommand : IAudioCommand {
-		public delegate int ValueProvider();
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that changes the value of <see cref="UnityEngine.AudioSource.priority"/>.
+		/// </summary>
+		public readonly struct Priority : IAudioCommand {
+			public delegate int ValueProvider();
 
-		private readonly ValueProvider valueProvider;
+			private readonly ValueProvider valueProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public PriorityAudioCommand(ValueProvider valueProvider) {
-			this.valueProvider = valueProvider;
-		}
+			public Priority(ValueProvider valueProvider) {
+				this.valueProvider = valueProvider;
+			}
 
-		public PriorityAudioCommand(int value) : this(() => value) { }
+			public Priority(int value) : this(() => value) { }
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			context.Source.priority = valueProvider();
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				context.Source.priority = valueProvider();
+			}
 		}
 	}
 }

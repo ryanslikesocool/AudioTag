@@ -19,7 +19,7 @@ namespace AudioTag {
 		public bool IsEmpty => Length == 0;
 
 		public bool RequiresLoading => clips.Any(clip => clip != null ? !clip.preloadAudioData : false);
-		public LoadState LoadState => clips.Reduce(LoadState.None, (result, element) => {
+		public LoadStateMask LoadState => clips.Reduce(LoadStateMask.None, (result, element) => {
 			if (element != null) {
 				return result | element.loadState.ToAudioTag();
 			} else {

@@ -1,26 +1,28 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that changes the value of <see cref="UnityEngine.AudioSource.dopplerLevel"/>.
-	/// </summary>
-	public readonly struct DopplerLevelAudioCommand : IAudioCommand {
-		public delegate float ValueProvider();
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that changes the value of <see cref="UnityEngine.AudioSource.dopplerLevel"/>.
+		/// </summary>
+		public readonly struct DopplerLevel : IAudioCommand {
+			public delegate float ValueProvider();
 
-		private readonly ValueProvider valueProvider;
+			private readonly ValueProvider valueProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public DopplerLevelAudioCommand(ValueProvider valueProvider) {
-			this.valueProvider = valueProvider;
-		}
+			public DopplerLevel(ValueProvider valueProvider) {
+				this.valueProvider = valueProvider;
+			}
 
-		public DopplerLevelAudioCommand(float value) : this(() => value) { }
+			public DopplerLevel(float value) : this(() => value) { }
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			context.Source.dopplerLevel = valueProvider();
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				context.Source.dopplerLevel = valueProvider();
+			}
 		}
 	}
 }

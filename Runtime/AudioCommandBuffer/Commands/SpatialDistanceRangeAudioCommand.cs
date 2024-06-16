@@ -3,28 +3,30 @@
 using Foundation;
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that changes the value of <see cref="UnityEngine.AudioSource.minDistance"/> and <see cref="UnityEngine.AudioSource.maxDistance"/>.
-	/// </summary>
-	public readonly struct SpatialDistanceRangeAudioCommand : IAudioCommand {
-		public delegate (float, float) ValueProvider();
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that changes the value of <see cref="UnityEngine.AudioSource.minDistance"/> and <see cref="UnityEngine.AudioSource.maxDistance"/>.
+		/// </summary>
+		public readonly struct SpatialDistanceRange : IAudioCommand {
+			public delegate (float, float) ValueProvider();
 
-		private readonly ValueProvider valueProvider;
+			private readonly ValueProvider valueProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public SpatialDistanceRangeAudioCommand(ValueProvider valueProvider) {
-			this.valueProvider = valueProvider;
-		}
+			public SpatialDistanceRange(ValueProvider valueProvider) {
+				this.valueProvider = valueProvider;
+			}
 
-		public SpatialDistanceRangeAudioCommand(float min, float max) : this(() => (min, max)) { }
+			public SpatialDistanceRange(float min, float max) : this(() => (min, max)) { }
 
-		public SpatialDistanceRangeAudioCommand(ClosedRange<float> range) : this(range.lowerBound, range.upperBound) { }
+			public SpatialDistanceRange(ClosedRange<float> range) : this(range.lowerBound, range.upperBound) { }
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			(context.Source.minDistance, context.Source.maxDistance) = valueProvider();
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				(context.Source.minDistance, context.Source.maxDistance) = valueProvider();
+			}
 		}
 	}
 }

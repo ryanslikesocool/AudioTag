@@ -17,7 +17,7 @@ namespace AudioTag {
 		public AudioDescriptor[] data = new AudioDescriptor[0];
 
 		public bool RequiresLoading => data?.Any(data => data.RequiresLoading) ?? false;
-		public LoadState LoadState => data?.Reduce(LoadState.None, (result, element) => element.LoadState) ?? LoadState.None;
+		public LoadStateMask LoadState => data?.Reduce(LoadStateMask.None, (result, element) => element.LoadState) ?? LoadStateMask.None;
 
 		// MARK: -
 

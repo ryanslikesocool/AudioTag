@@ -5,28 +5,30 @@ using Foundation;
 using UnityEngine;
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that changes the value of <see cref="AudioSource.clip"/>.
-	/// </summary>
-	public readonly struct ClipAudioCommand : IAudioCommand {
-		public delegate AudioClip ValueProvider();
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that changes the value of <see cref="AudioSource.clip"/>.
+		/// </summary>
+		public readonly struct Clip : IAudioCommand_Clip {
+			public delegate AudioClip ValueProvider();
 
-		private readonly ValueProvider valueProvider;
+			private readonly ValueProvider valueProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public ClipAudioCommand(ValueProvider valueProvider) {
-			this.valueProvider = valueProvider;
-		}
+			public Clip(ValueProvider valueProvider) {
+				this.valueProvider = valueProvider;
+			}
 
-		public ClipAudioCommand(AudioClip value) : this(() => value) { }
+			public Clip(AudioClip value) : this(() => value) { }
 
-		public ClipAudioCommand(IList<AudioClip> values) : this(() => values.Random()) { }
+			public Clip(IList<AudioClip> values) : this(() => values.Random()) { }
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			context.Source.clip = valueProvider();
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				context.Source.clip = valueProvider();
+			}
 		}
 	}
 }

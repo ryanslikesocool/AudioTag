@@ -23,7 +23,7 @@ namespace AudioTag {
 			public readonly bool IsEmpty => Length == 0;
 
 			public readonly bool RequiresLoading => backing.Any(clip => clip != null ? !clip.preloadAudioData : false);
-			public readonly LoadState LoadState => backing.Reduce(LoadState.None, (result, element) => {
+			public readonly LoadStateMask LoadState => backing.Reduce(LoadStateMask.None, (result, element) => {
 				if (element != null) {
 					return result | element.loadState.ToAudioTag();
 				} else {

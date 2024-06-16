@@ -3,30 +3,32 @@
 using Foundation;
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that changes the value of <see cref="UnityEngine.AudioSource.volume"/>.
-	/// </summary>
-	public readonly struct VolumeAudioCommand : IAudioCommand {
-		public delegate float ValueProvider();
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that changes the value of <see cref="UnityEngine.AudioSource.volume"/>.
+		/// </summary>
+		public readonly struct Volume : IAudioCommand {
+			public delegate float ValueProvider();
 
-		public readonly ValueProvider valueProvider;
+			public readonly ValueProvider valueProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public VolumeAudioCommand(ValueProvider valueProvider) {
-			this.valueProvider = valueProvider;
-		}
+			public Volume(ValueProvider valueProvider) {
+				this.valueProvider = valueProvider;
+			}
 
-		public VolumeAudioCommand(float volume) : this(() => volume) { }
+			public Volume(float volume) : this(() => volume) { }
 
-		public VolumeAudioCommand(float min, float max) : this(() => UnityEngine.Random.Range(min, max)) { }
+			public Volume(float min, float max) : this(() => UnityEngine.Random.Range(min, max)) { }
 
-		public VolumeAudioCommand(ClosedRange<float> range) : this(range.lowerBound, range.upperBound) { }
+			public Volume(ClosedRange<float> range) : this(range.lowerBound, range.upperBound) { }
 
-		// MARK: -
+			// MARK: -
 
-		public readonly void Execute(ref AudioCommandBuffer.Context context) {
-			context.Source.volume = valueProvider();
+			public readonly void Execute(ref AudioCommandBuffer.Context context) {
+				context.Source.volume = valueProvider();
+			}
 		}
 	}
 }

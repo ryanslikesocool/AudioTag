@@ -3,26 +3,28 @@
 using UnityEngine.Audio;
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that changes the value of <see cref="UnityEngine.AudioSource.outputAudioMixerGroup"/>.
-	/// </summary>
-	public readonly struct MixerAudioCommand : IAudioCommand {
-		public delegate AudioMixerGroup ValueProvider();
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that changes the value of <see cref="UnityEngine.AudioSource.outputAudioMixerGroup"/>.
+		/// </summary>
+		public readonly struct Mixer : IAudioCommand {
+			public delegate AudioMixerGroup ValueProvider();
 
-		private readonly ValueProvider valueProvider;
+			private readonly ValueProvider valueProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public MixerAudioCommand(ValueProvider valueProvider) {
-			this.valueProvider = valueProvider;
-		}
+			public Mixer(ValueProvider valueProvider) {
+				this.valueProvider = valueProvider;
+			}
 
-		public MixerAudioCommand(AudioMixerGroup value) : this(() => value) { }
+			public Mixer(AudioMixerGroup value) : this(() => value) { }
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			context.Source.outputAudioMixerGroup = valueProvider();
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				context.Source.outputAudioMixerGroup = valueProvider();
+			}
 		}
 	}
 }

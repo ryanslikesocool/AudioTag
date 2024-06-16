@@ -1,24 +1,26 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that runs a custom block of code.
-	/// </summary>
-	public readonly struct CustomAudioCommand : IAudioCommand {
-		public delegate void Body(ref AudioCommandBuffer.Context context);
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that runs a custom block of code.
+		/// </summary>
+		public readonly struct Custom : IAudioCommand {
+			public delegate void Body(ref AudioCommandBuffer.Context context);
 
-		private readonly Body body;
+			private readonly Body body;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public CustomAudioCommand(Body body) {
-			this.body = body;
-		}
+			public Custom(Body body) {
+				this.body = body;
+			}
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			body(ref context);
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				body(ref context);
+			}
 		}
 	}
 }

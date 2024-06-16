@@ -1,26 +1,28 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that changes the value of <see cref="UnityEngine.AudioSource.loop"/>.
-	/// </summary>
-	public readonly struct LoopAudioCommand : IAudioCommand {
-		public delegate bool ValueProvider();
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that changes the value of <see cref="UnityEngine.AudioSource.loop"/>.
+		/// </summary>
+		public readonly struct Loop : IAudioCommand {
+			public delegate bool ValueProvider();
 
-		private readonly ValueProvider valueProvider;
+			private readonly ValueProvider valueProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public LoopAudioCommand(ValueProvider valueProvider) {
-			this.valueProvider = valueProvider;
-		}
+			public Loop(ValueProvider valueProvider) {
+				this.valueProvider = valueProvider;
+			}
 
-		public LoopAudioCommand(bool value) : this(() => value) { }
+			public Loop(bool value) : this(() => value) { }
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			context.Source.loop = valueProvider();
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				context.Source.loop = valueProvider();
+			}
 		}
 	}
 }

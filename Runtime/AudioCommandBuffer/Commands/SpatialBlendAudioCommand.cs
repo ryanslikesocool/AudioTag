@@ -1,26 +1,28 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 namespace AudioTag {
-	/// <summary>
-	/// A command that changes the value of <see cref="UnityEngine.AudioSource.spatialBlend"/>.
-	/// </summary>
-	public readonly struct SpatialBlendAudioCommand : IAudioCommand {
-		public delegate float ValueProvider();
+	public static partial class AudioCommand {
+		/// <summary>
+		/// A command that changes the value of <see cref="UnityEngine.AudioSource.spatialBlend"/>.
+		/// </summary>
+		public readonly struct SpatialBlend : IAudioCommand {
+			public delegate float ValueProvider();
 
-		private readonly ValueProvider valueProvider;
+			private readonly ValueProvider valueProvider;
 
-		// MARK: - Lifecycle
+			// MARK: - Lifecycle
 
-		public SpatialBlendAudioCommand(ValueProvider valueProvider) {
-			this.valueProvider = valueProvider;
-		}
+			public SpatialBlend(ValueProvider valueProvider) {
+				this.valueProvider = valueProvider;
+			}
 
-		public SpatialBlendAudioCommand(float value) : this(() => value) { }
+			public SpatialBlend(float value) : this(() => value) { }
 
-		// MARK: -
+			// MARK: -
 
-		public void Execute(ref AudioCommandBuffer.Context context) {
-			context.Source.spatialBlend = valueProvider();
+			public void Execute(ref AudioCommandBuffer.Context context) {
+				context.Source.spatialBlend = valueProvider();
+			}
 		}
 	}
 }
