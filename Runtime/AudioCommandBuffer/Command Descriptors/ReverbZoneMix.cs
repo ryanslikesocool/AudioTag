@@ -1,14 +1,12 @@
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class ReverbZoneMix : AudioCommandDescriptor {
-				public float value = 1;
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
-				// MARK: -
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class ReverbZoneMix : AudioCommandDescriptor {
+		public float value = 1;
 
-				public override IAudioCommand Resolve()
-					=> new AudioCommand.ReverbZoneMix(value);
-			}
-		}
+		// MARK: -
+
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.ReverbZoneMix(value);
 	}
 }

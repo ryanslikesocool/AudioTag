@@ -6,21 +6,14 @@ using Foundation;
 namespace AudioTag {
 	public partial struct AudioCommandBuffer {
 		public sealed class Context : ICommandBufferContext {
-			public AudioDescriptor Descriptor { get; }
-			public AudioInstance Instance { get; }
-
-			public AudioSource Source => Instance.Source;
-			public bool IsPlaying => Source != null && Source.isPlaying;
+			public readonly AudioPool pool;
+			public readonly AudioSource instance;
 
 			// MARK: - Lifecycle
 
-			internal Context(AudioDescriptor descriptor, AudioInstance instance) {
-				this.Descriptor = descriptor;
-				this.Instance = instance;
-			}
-
-			internal void Complete() {
-
+			internal Context(AudioPool pool, AudioSource instance) {
+				this.pool = pool;
+				this.instance = instance;
 			}
 		}
 	}

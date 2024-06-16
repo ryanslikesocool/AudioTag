@@ -1,16 +1,14 @@
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
+
 using Foundation;
 
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class RandomPitch : AudioCommandDescriptor {
-				public ClosedRange<float> value = new ClosedRange<float>(0.75f, 1.25f);
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class RandomPitch : AudioCommandDescriptor {
+		public ClosedRange<float> value = new ClosedRange<float>(0.75f, 1.25f);
 
-				// MARK: -
+		// MARK: -
 
-				public override IAudioCommand Resolve()
-					=> new Pitch(value);
-			}
-		}
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.Pitch(value);
 	}
 }

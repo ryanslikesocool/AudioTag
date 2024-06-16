@@ -1,16 +1,14 @@
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
+
 using UnityEngine;
 
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class PitchAudio : AudioCommandDescriptor {
-				[Range(-3, 3)] public float value;
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class Pitch : AudioCommandDescriptor {
+		[Range(-3, 3)] public float value = 1;
 
-				// MARK: -
+		// MARK: -
 
-				public override IAudioCommand Resolve()
-					=> new Pitch(value);
-			}
-		}
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.Pitch(value);
 	}
 }

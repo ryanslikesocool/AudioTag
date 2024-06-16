@@ -1,14 +1,12 @@
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class BypassReverbZones : AudioCommandDescriptor {
-				public bool value = false;
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
-				// MARK: -
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class BypassReverbZones : AudioCommandDescriptor {
+		public bool value = false;
 
-				public override IAudioCommand Resolve()
-					=> new AudioCommand.BypassReverbZones(value);
-			}
-		}
+		// MARK: -
+
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.BypassReverbZones(value);
 	}
 }

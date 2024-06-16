@@ -1,16 +1,14 @@
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
+
 using UnityEngine;
 
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class PriorityAudioCommandDescriptor : AudioCommandDescriptor {
-				[Range(0, 256)] public int value = 128;
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class Priority : AudioCommandDescriptor {
+		[Range(0, 256)] public int value = 128;
 
-				// MARK: -
+		// MARK: -
 
-				public override IAudioCommand Resolve()
-					=> new Priority(value);
-			}
-		}
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.Priority(value);
 	}
 }

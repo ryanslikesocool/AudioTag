@@ -1,16 +1,14 @@
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
+
 using UnityEngine;
 
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class RandomClip : AudioCommandDescriptor {
-				public AudioClip[] value = new AudioClip[0];
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class RandomClip : AudioCommandDescriptor {
+		public AudioClip[] value = new AudioClip[0];
 
-				// MARK: -
+		// MARK: -
 
-				public override IAudioCommand Resolve()
-					=> new AudioCommand.Clip(value);
-			}
-		}
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.Clip(value);
 	}
 }

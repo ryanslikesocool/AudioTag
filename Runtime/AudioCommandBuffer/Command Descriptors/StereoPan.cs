@@ -1,16 +1,14 @@
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
+
 using UnityEngine;
 
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class StereoPan : AudioCommandDescriptor {
-				[Range(-1.0f, 1.0f)] public float value = 0;
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class StereoPan : AudioCommandDescriptor {
+		[Range(-1.0f, 1.0f)] public float value = 0;
 
-				// MARK: -
+		// MARK: -
 
-				public override IAudioCommand Resolve()
-					=> new AudioCommand.StereoPan(value);
-			}
-		}
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.StereoPan(value);
 	}
 }

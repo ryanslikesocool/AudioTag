@@ -1,17 +1,15 @@
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
+
 using UnityEngine;
 
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class Translation : AudioCommandDescriptor {
-				public Space space = Space.Self;
-				public Vector3 value = Vector3.zero;
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class Translation : AudioCommandDescriptor {
+		public Space space = Space.Self;
+		public Vector3 value = Vector3.zero;
 
-				// MARK: -
+		// MARK: -
 
-				public override IAudioCommand Resolve()
-					=> new AudioCommand.Translation(space, value);
-			}
-		}
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.Translation(space, value);
 	}
 }

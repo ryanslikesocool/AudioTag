@@ -1,17 +1,14 @@
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
+
 using Foundation;
 
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class RandomVolume : AudioCommandDescriptor {
+		public ClosedRange<float> value = new ClosedRange<float>(0.5f, 1.0f);
 
-			public sealed class RandomVolume : AudioCommandDescriptor {
-				public ClosedRange<float> value = new ClosedRange<float>(0.5f, 1.0f);
+		// MARK: -
 
-				// MARK: -
-
-				public override IAudioCommand Resolve()
-					=> new AudioCommand.Volume(value);
-			}
-		}
+		public override IAudioCommand Resolve()
+			=> new AudioCommand.Volume(value);
 	}
 }

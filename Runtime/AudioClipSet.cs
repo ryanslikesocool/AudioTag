@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using static System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace AudioTag {
-	[CreateAssetMenu(menuName = "Developed With Love/DWL Audio/Audio Clip Set")]
+	[CreateAssetMenu(menuName = "Developed With Love/Audio/Clip Set")]
 	public sealed class AudioClipSet : ScriptableObject, IEnumerable<AudioClip> {
 		[SerializeField] private AudioClip[] clips = new AudioClip[0];
 
@@ -26,6 +26,20 @@ namespace AudioTag {
 				return result;
 			}
 		});
+
+		// MARK: - Load State
+
+		public void Load() {
+			foreach (AudioClip clip in clips) {
+				clip.LoadAudioData();
+			}
+		}
+
+		public void Unload() {
+			foreach (AudioClip clip in clips) {
+				clip.UnloadAudioData();
+			}
+		}
 
 		// MARK: - IEnumerable
 

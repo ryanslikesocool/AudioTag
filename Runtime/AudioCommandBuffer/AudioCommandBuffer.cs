@@ -3,6 +3,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Foundation;
+using UnityEngine;
+using System.Runtime.CompilerServices;
+using static System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace AudioTag {
 	public partial struct AudioCommandBuffer : ICommandBuffer<AudioCommandBuffer.Context, IAudioCommand> {
@@ -14,19 +17,41 @@ namespace AudioTag {
 			this.commands = commands.ToList();
 		}
 
+		// MARK: - Operators
+
+		[MethodImpl(AggressiveInlining)]
+		public static implicit operator AudioCommandBuffer(AudioCommandBufferDescriptor descriptor)
+			=> descriptor.Resolve();
+
+		[MethodImpl(AggressiveInlining)]
+		public static implicit operator AudioCommandBuffer(IAudioCommand[] commands)
+			=> new AudioCommandBuffer(commands);
+
+		[MethodImpl(AggressiveInlining)]
+		public static implicit operator AudioCommandBuffer(List<IAudioCommand> commands)
+			=> new AudioCommandBuffer(commands);
+
+		[MethodImpl(AggressiveInlining)]
+		public static implicit operator AudioCommandBuffer(AudioCommandDescriptor[] commands)
+			=> new AudioCommandBuffer(commands.Resolve());
+
+		[MethodImpl(AggressiveInlining)]
+		public static implicit operator AudioCommandBuffer(List<AudioCommandDescriptor> commands)
+			=> new AudioCommandBuffer(commands.Resolve());
+
 		// MARK: -
 
+		[MethodImpl(AggressiveInlining)]
 		public void Add(IAudioCommand command)
 			=> (commands ??= new List<IAudioCommand>()).Add(command);
 
-		public readonly void Run(AudioDescriptor descriptor, AudioInstance instance) {
-			Context context = new Context(descriptor, instance);
+		[MethodImpl(AggressiveInlining)]
+		public readonly void Execute(AudioSource instance) {
+			Context context = new Context(AudioPool.Shared, instance);
 
 			foreach (IAudioCommand command in commands) {
 				command.Execute(ref context);
 			}
-
-			context.Complete();
 		}
 	}
 }

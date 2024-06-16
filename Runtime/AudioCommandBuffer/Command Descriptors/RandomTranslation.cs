@@ -1,18 +1,16 @@
+// Developed With Love by Ryan Boyer https://ryanjboyer.com <3
+
 using UnityEngine;
 
-namespace AudioTag {
-	public static partial class AudioCommand {
-		public static partial class Descriptor {
-			public sealed class RandomTranslation : AudioCommandDescriptor {
-				public Space space = Space.Self;
-				public Vector3 min = -Vector3.one;
-				public Vector3 max = Vector3.one;
+namespace AudioTag.AudioCommand.Descriptor {
+	public sealed class RandomTranslation : AudioCommandDescriptor {
+		public Space space = Space.Self;
+		public Vector3 min = -Vector3.one;
+		public Vector3 max = Vector3.one;
 
-				// MARK: -
+		// MARK: -
 
-				public override IAudioCommand Resolve()
-					=> AudioCommand.Translation.Random(space, min, max);
-			}
-		}
+		public override IAudioCommand Resolve()
+			=> AudioCommand.Translation.Random(space, min, max);
 	}
 }
