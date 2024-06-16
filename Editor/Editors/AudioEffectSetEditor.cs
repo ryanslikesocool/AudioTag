@@ -11,16 +11,12 @@ namespace AudioTag.Editors {
 	internal class AudioEffectSetEditor : UnityEditor.Editor {
 		private new AudioEffectSet target;
 
-		private SerializedProperty key;
-
 		private SerializedProperty loadOnLaunch;
 		private SerializedProperty mixerGroup;
 		private SerializedProperty data;
 
 		public void OnEnable() {
 			target = (AudioEffectSet)base.target;
-
-			key = serializedObject.FindProperty(Properties.KEY);
 
 			loadOnLaunch = serializedObject.FindProperty(Properties.LOAD_ON_LAUNCH);
 			mixerGroup = serializedObject.FindProperty(Properties.MIXER_GROUP);
@@ -40,7 +36,6 @@ namespace AudioTag.Editors {
 
 		private void InfoGUI() {
 			using (new BoxGroupScope(Strings.INFO)) {
-				EditorGUILayout.PropertyField(key, Styles.key);
 				using (new EditorGUI.DisabledGroupScope(true)) {
 					EditorGUILayout.Toggle(Styles.requiresLoading, target.RequiresLoading);
 					EditorGUILayout.EnumFlagsField(Styles.loadState, target.LoadState);
@@ -59,8 +54,6 @@ namespace AudioTag.Editors {
 		// MARK: - Styles
 
 		internal static class Properties {
-			public const string KEY = "key";
-
 			public const string LOAD_ON_LAUNCH = "loadOnLaunch";
 			public const string MIXER_GROUP = "mixerGroup";
 			public const string DATA = "data";
@@ -72,7 +65,6 @@ namespace AudioTag.Editors {
 		}
 
 		internal static class Styles {
-			public static readonly GUIContent key = new GUIContent("Key", "The set's key, used to access the set in code.");
 			public static readonly GUIContent requiresLoading = new GUIContent("Requires Loading", "Do any of the audio clips in this set have the \"Load in Background\" flag active?");
 			public static readonly GUIContent loadState = new GUIContent("Load State", "The load states of all clips in this set.");
 
