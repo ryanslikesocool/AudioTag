@@ -1,6 +1,5 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
-using System.Linq;
 using UnityEngine;
 using System.Runtime.CompilerServices;
 using static System.Runtime.CompilerServices.MethodImplOptions;
@@ -8,7 +7,7 @@ using static System.Runtime.CompilerServices.MethodImplOptions;
 namespace AudioTag {
 	[CreateAssetMenu(menuName = "Developed With Love/Audio/Command Buffer")]
 	public partial class AudioCommandBufferDescriptor : ScriptableObject {
-		[SerializeField, Get] private AudioCommandDescriptor[] commands = new AudioCommandDescriptor[0];
+		public AudioCommandDescriptorList commands = default;
 
 		// MARK: -
 
@@ -17,6 +16,6 @@ namespace AudioTag {
 		/// </summary>
 		[MethodImpl(AggressiveInlining)]
 		public AudioCommandBuffer Resolve()
-		 	=> new AudioCommandBuffer(commands.Select(command => command.Resolve()));
+		 	=> new AudioCommandBuffer(commands.Resolve());
 	}
 }

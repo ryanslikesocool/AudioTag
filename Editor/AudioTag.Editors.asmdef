@@ -3,6 +3,7 @@
     "rootNamespace": "AudioTag.Editors",
     "references": [
         "GUID:e71646fcf745d49f899078092f217ff2",
+        "GUID:d9366e63b425d409b97e07a533ec79d9",
         "GUID:2305d81fae9c94c1294cc7e76272c158"
     ],
     "includePlatforms": [],

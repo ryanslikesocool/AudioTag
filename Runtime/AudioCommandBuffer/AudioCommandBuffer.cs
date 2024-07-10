@@ -39,6 +39,10 @@ namespace AudioTag {
 		public static implicit operator AudioCommandBuffer(List<AudioCommandDescriptor> commands)
 			=> new AudioCommandBuffer(commands.Resolve());
 
+		[MethodImpl(AggressiveInlining)]
+		public static implicit operator AudioCommandBuffer(AudioCommandDescriptorList commands)
+			=> new AudioCommandBuffer(commands.Resolve());
+
 		// MARK: -
 
 		[MethodImpl(AggressiveInlining)]

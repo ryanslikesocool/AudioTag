@@ -46,12 +46,11 @@ namespace AudioTag {
 			ValidatePrefab();
 
 			AudioSource instance = GameObject.Instantiate(prefab);
-			instance.gameObject.hideFlags = ProjectSettings.Instance.instanceHideFlags;
 			return instance;
 		}
 
 		private void OnPoolGet(AudioSource instance) {
-			instance.Execute(ProjectSettings.Instance.resetCommandBuffer);
+			instance.Execute(ProjectSettings.ResetCommandBuffer);
 
 			instance.gameObject.SetActive(true);
 
