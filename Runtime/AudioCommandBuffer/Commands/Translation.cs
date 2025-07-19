@@ -17,18 +17,30 @@ namespace AudioTag.AudioCommand {
 			this.valueProvider = valueProvider;
 		}
 
+		/// <summary>
+		/// Create a command that returns a fixed value.
+		/// </summary>
 		public Translation(Space space, Vector3 volume) : this(() => (space, volume)) { }
 
+		/// <summary>
+		/// Create a command that returns a random value in a range.
+		/// </summary>
 		public static Translation Random(Space space, Vector3 min, Vector3 max)
 			=> new Translation(() => (space, Vector3.Lerp(min, max, UnityEngine.Random.Range(0.0f, 1.0f))));
 
+		/// <summary>
+		/// Create a command that returns a random value in a range.
+		/// </summary>
 		public static Translation RandomOnSphere(Space space, Vector3 center, float radius)
 			=> new Translation(() => (space, center + UnityEngine.Random.onUnitSphere * radius));
 
+		/// <summary>
+		/// Create a command that returns a random value in a range.
+		/// </summary>
 		public static Translation RandomInSphere(Space space, Vector3 center, float radius)
 			=> new Translation(() => (space, center + UnityEngine.Random.insideUnitSphere * radius));
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public readonly void Execute(ref AudioCommandBuffer.Context context) {
 			(Space space, Vector3 value) = valueProvider();

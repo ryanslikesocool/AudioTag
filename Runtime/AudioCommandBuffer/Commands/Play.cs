@@ -20,7 +20,7 @@ namespace AudioTag.AudioCommand {
 
 		public Play(ClosedRange<float> delayRange) : this(delayRange.lowerBound, delayRange.upperBound) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			if (delayProvider == null) {

@@ -23,7 +23,7 @@ namespace AudioTag.AudioCommand {
 
 		public Clip(IList<AudioClip> values) : this(() => values.Random()) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			context.instance.clip = valueProvider();

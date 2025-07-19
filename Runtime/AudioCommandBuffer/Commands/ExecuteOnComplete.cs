@@ -1,5 +1,5 @@
-using ClockKit;
 using System.Collections.Generic;
+using ClockKit;
 using UnityEngine;
 
 namespace AudioTag.AudioCommand {
@@ -7,7 +7,7 @@ namespace AudioTag.AudioCommand {
 	/// Delay the execution of commands until the instance is finished playing.
 	/// </summary>
 	public readonly struct ExecuteCommandsOnComplete : IAudioCommand {
-		public delegate IEnumerable<IAudioCommand> ValueProvider();
+		public delegate (CKQueue, IEnumerable<IAudioCommand>) ValueProvider();
 
 		public readonly ValueProvider valueProvider;
 
@@ -17,18 +17,20 @@ namespace AudioTag.AudioCommand {
 			this.valueProvider = valueProvider;
 		}
 
-		public ExecuteCommandsOnComplete(IEnumerable<IAudioCommand> commands) : this(() => commands) { }
+		public ExecuteCommandsOnComplete(CKQueue queue, IEnumerable<IAudioCommand> commands) : this(() => (queue, commands)) { }
 
-		// MARK: -
+		public ExecuteCommandsOnComplete(IEnumerable<IAudioCommand> commands) : this(queue: CKQueue.Default, commands: commands) { }
+
+		// MARK: - IAudioCommand
 
 		public readonly void Execute(ref AudioCommandBuffer.Context context) {
 			AudioCommandBuffer.Context localContext = context;
-			IEnumerable<IAudioCommand> localCommands = valueProvider();
+			(CKQueue queue, IEnumerable<IAudioCommand> localCommands) = valueProvider();
 
 			float clipDuration = context.instance.clip.length;
 			float speedMultiplier = Mathf.Abs(context.instance.pitch);
 			float duration = clipDuration * speedMultiplier;
-			CKClock.Delay(seconds: duration, OnComplete);
+			CKClock.Delay(queue: queue, seconds: duration, OnComplete);
 
 			void OnComplete() {
 				foreach (IAudioCommand item in localCommands) {

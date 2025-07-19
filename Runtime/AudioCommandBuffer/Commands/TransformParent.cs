@@ -19,7 +19,7 @@ namespace AudioTag.AudioCommand {
 
 		public TransformParent(Transform transform, bool keepWorldPosition = true) : this(() => (transform, keepWorldPosition)) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public readonly void Execute(ref AudioCommandBuffer.Context context) {
 			(Transform newParent, bool keepWorldPosition) = valueProvider();

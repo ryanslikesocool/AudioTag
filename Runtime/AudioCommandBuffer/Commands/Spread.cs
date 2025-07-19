@@ -17,7 +17,7 @@ namespace AudioTag.AudioCommand {
 
 		public Spread(float value) : this(() => value) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			context.instance.spread = valueProvider();

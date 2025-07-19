@@ -19,7 +19,7 @@ namespace AudioTag.AudioCommand {
 
 		public VelocityUpdateMode(AudioVelocityUpdateMode value) : this(() => value) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			context.instance.velocityUpdateMode = valueProvider();

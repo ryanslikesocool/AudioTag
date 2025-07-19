@@ -44,7 +44,7 @@ namespace AudioTag.AudioCommand {
 
 		public PlayOneShot(ClipProvider clipProvider, ClosedRange<float> volumeScaleRange) : this(clipProvider, () => Random.Range(volumeScaleRange.lowerBound, volumeScaleRange.upperBound)) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			if (volumeScaleProvider == null) {

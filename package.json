@@ -8,15 +8,13 @@
   "licenseUrl": "https://github.com/ryanslikesocool/AudioTag/blob/main/LICENSE.md",
   "author": {
     "name": "Ryan Boyer",
-    "email": "ryanjboyer@gmail.com",
-    "url": "http://ryanjboyer.com/"
+    "url": "https://ryanjboyer.com/"
   },
   "type": "library",
   "dependencies": {
     "com.unity.modules.audio": "1.0.0",
     "com.developedwithlove.clockkit": "2.3.3",
     "com.developedwithlove.foundation": "0.1.0-pre.1",
-    "com.developedwithlove.foundation.generators": "0.1.0-pre.1",
     "com.developedwithlove.foundation.safety": "0.1.0-pre.1",
     "com.developedwithlove.foundation.commandbuffer": "0.1.0-pre.1"
   }

@@ -17,7 +17,7 @@ namespace AudioTag.AudioCommand {
 
 		public SpatializePostEffects(bool value) : this(() => value) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			context.instance.spatializePostEffects = valueProvider();

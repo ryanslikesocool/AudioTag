@@ -13,6 +13,6 @@ namespace AudioTag.AudioCommand.Descriptor {
 		// MARK: -
 
 		public override IAudioCommand Resolve()
-			=> new AudioCommand.Volume(value);
+			=> AudioCommand.Volume.Random(value);
 	}
 }

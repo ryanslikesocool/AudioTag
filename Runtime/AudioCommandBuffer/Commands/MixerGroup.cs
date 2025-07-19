@@ -19,7 +19,7 @@ namespace AudioTag.AudioCommand {
 
 		public MixerGroup(AudioMixerGroup value) : this(() => value) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			context.instance.outputAudioMixerGroup = valueProvider();

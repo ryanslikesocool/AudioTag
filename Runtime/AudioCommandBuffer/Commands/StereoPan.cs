@@ -19,7 +19,7 @@ namespace AudioTag.AudioCommand {
 
 		public StereoPan(float min, float max) : this(() => UnityEngine.Random.Range(min, max)) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			context.instance.panStereo = valueProvider();

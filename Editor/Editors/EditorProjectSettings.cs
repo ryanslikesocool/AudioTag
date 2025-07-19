@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace AudioTag.Editors {
 	internal sealed partial class EditorProjectSettings : _AudioProjectSettings {
-		[SerializeField, Get] private PreloadSettings preload = default;
+		[SerializeField] private PreloadSettings preload = default;
+
+		// MARK: - Properties
+		
+		public PreloadSettings Preload => preload;
 	}
 }

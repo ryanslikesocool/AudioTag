@@ -7,7 +7,7 @@ namespace AudioTag.AudioCommand {
 	public readonly struct Release : IAudioCommand, IAudioCommand_Release {
 		public static readonly Release Default = new Release();
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			context.pool.Release(context.instance);

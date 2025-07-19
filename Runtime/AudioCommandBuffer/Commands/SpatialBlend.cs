@@ -17,7 +17,7 @@ namespace AudioTag.AudioCommand {
 
 		public SpatialBlend(float value) : this(() => value) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			context.instance.spatialBlend = valueProvider();

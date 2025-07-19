@@ -21,7 +21,7 @@ namespace AudioTag.AudioCommand {
 
 		public SpatialDistanceRange(ClosedRange<float> range) : this(range.lowerBound, range.upperBound) { }
 
-		// MARK: -
+		// MARK: - IAudioCommand
 
 		public void Execute(ref AudioCommandBuffer.Context context) {
 			(context.instance.minDistance, context.instance.maxDistance) = valueProvider();

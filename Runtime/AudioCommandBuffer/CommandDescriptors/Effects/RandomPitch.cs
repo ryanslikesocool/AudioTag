@@ -13,6 +13,6 @@ namespace AudioTag.AudioCommand.Descriptor {
 		// MARK: -
 
 		public override IAudioCommand Resolve()
-			=> new AudioCommand.Pitch(value);
+			=> AudioCommand.Pitch.Random(value);
 	}
 }

@@ -1,50 +1,51 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
+using System;
 using Foundation;
 
 namespace AudioTag.AudioCommand {
 	/// <summary>
-	/// A command that changes the value of <see cref="UnityEngine.AudioSource.pitch"/>.
+	/// A command that changes the value of <see cref="UnityEngine.AudioSource.volume"/>.
 	/// </summary>
-	public readonly struct Pitch : IAudioCommand {
+	public readonly struct Volume : IAudioCommand {
 		public delegate float ValueProvider();
 
 		private readonly ValueProvider valueProvider;
 
 		// MARK: - Lifecycle
 
-		public Pitch(ValueProvider valueProvider) {
+		public Volume(ValueProvider valueProvider) {
 			this.valueProvider = valueProvider;
 		}
 
 		/// <summary>
 		/// Create a command that returns a fixed value.
 		/// </summary>
-		public Pitch(float volume) : this(() => volume) { }
+		public Volume(float volume) : this(() => volume) { }
 
 		/// <summary>
 		/// Create a command that returns a random value in a range.
 		/// </summary>
-		[System.Obsolete("Use `Pitch.Random` instead.")]
-		public Pitch(float min, float max) : this(() => UnityEngine.Random.Range(min, max)) { }
+		[Obsolete("Use `Volume.Random` instead.")]
+		public Volume(float min, float max) : this(() => UnityEngine.Random.Range(min, max)) { }
 
 		/// <summary>
 		/// Create a command that returns a random value in a range.
 		/// </summary>
-		[System.Obsolete("Use `Pitch.Random` instead.")]
-		public Pitch(ClosedRange<float> range) : this(range.lowerBound, range.upperBound) { }
+		[Obsolete("Use `Volume.Random` instead.")]
+		public Volume(ClosedRange<float> range) : this(range.lowerBound, range.upperBound) { }
 
 		/// <summary>
 		/// Create a command that returns a random value in a range.
 		/// </summary>
-		public static Pitch Random(float min, float max)
+		public static Volume Random(float min, float max)
 			=> new(() => UnityEngine.Random.Range(min, max));
 
 		/// <summary>
 		/// Create a command that returns a random value in a range.
 		/// </summary>
-		public static Pitch Random(ClosedRange<float> range)
-			=> Random(range.lowerBound, range.lowerBound);
+		public static Volume Random(ClosedRange<float> range)
+			=> Random(range.lowerBound, range.upperBound);
 
 		// MARK: -
 
@@ -60,7 +61,7 @@ namespace AudioTag.AudioCommand {
 		// MARK: - IAudioCommand
 
 		public readonly void Execute(ref AudioCommandBuffer.Context context) {
-			context.instance.pitch = GetCurrentValue();
+			context.instance.volume = GetCurrentValue();
 		}
 	}
 }

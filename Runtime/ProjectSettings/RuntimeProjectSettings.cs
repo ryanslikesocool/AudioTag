@@ -8,14 +8,19 @@ namespace AudioTag {
 
 		// MARK: - Fields
 
-		[SerializeField, Get] private AudioCommandDescriptorList resetCommandBuffer;
+		[SerializeField] private AudioCommandDescriptorList resetCommandBuffer;
 
-		[SerializeField, Get]
+		[SerializeField]
 		private PoolSettings pool = new PoolSettings {
 			collectionChecks = true,
 			defaultCapacity = 100,
 			maxSize = 10,
 		};
+
+		// MARK: - Properties
+
+		public AudioCommandDescriptorList ResetCommandBuffer => resetCommandBuffer;
+		public PoolSettings Pool => pool;
 
 		// MARK: - Lifecyle
 

@@ -2,10 +2,9 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using Foundation;
 using System.Linq;
-using UnityEngine;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using static System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace AudioTag {
@@ -19,7 +18,7 @@ namespace AudioTag {
 		public bool IsEmpty => Length == 0;
 
 		public bool RequiresLoading => clips.Any(clip => clip != null ? !clip.preloadAudioData : false);
-		public LoadStateMask LoadState => clips.Reduce(LoadStateMask.None, (result, element) => {
+		public LoadStateMask LoadState => clips.Aggregate(LoadStateMask.None, (result, element) => {
 			if (element != null) {
 				return result | element.loadState.ToAudioTag();
 			} else {

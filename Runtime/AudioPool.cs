@@ -6,7 +6,6 @@ using System.Runtime.CompilerServices;
 using static System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace AudioTag {
-	[Singleton]
 	public sealed partial class AudioPool {
 		private AudioSource prefab;
 
