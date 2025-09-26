@@ -6,7 +6,7 @@ using UnityEngine;
 namespace AudioTag {
 	[Serializable]
 	public sealed class AudioCommandDescriptorList {
-		[SerializeField] private AudioCommandDescriptor[] backing;
+		[SerializeField] internal AudioCommandDescriptor[] backing;
 
 		// MARK: -
 

@@ -1,8 +1,8 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
-using UnityEngine;
+using Foundation.Editor;
 using UnityEditor;
-using Foundation.Editors;
+using UnityEngine;
 
 namespace AudioTag.Editors {
 	[CustomEditor(typeof(EditorProjectSettings))]

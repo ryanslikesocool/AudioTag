@@ -1,7 +1,7 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 using System;
-using Foundation.Editors;
+using Foundation.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -36,11 +36,14 @@ namespace AudioTag.Editors {
 		// MARK: - Serialization
 
 		private static T GetOrCreateSettings<T>() where T : _AudioProjectSettings {
+			const string DEFAULT_ASSET_PATH_EDITOR = "Assets/Plugins/Developed With Love/AudioTag/Editor/Audio Project Settings.asset";
+			const string DEFAULT_ASSET_PATH_RUNTIME = "Assets/Plugins/Developed With Love/AudioTag/Runtime/Audio Project Settings.asset";
+
 			T settings = LoadExistingSettings<T>();
 			if (settings == null) {
 				string defaultSettingsPath = typeof(T) switch {
-					Type editorType when editorType == typeof(EditorProjectSettings) => "Assets/Plugins/Developed With Love/Editor/Audio Project Settings (Editor).asset",
-					Type runtimeType when runtimeType == typeof(RuntimeProjectSettings) => "Assets/Plugins/Developed With Love/Audio Project Settings (Runtime).asset",
+					Type editorType when editorType == typeof(EditorProjectSettings) => DEFAULT_ASSET_PATH_EDITOR,
+					Type runtimeType when runtimeType == typeof(RuntimeProjectSettings) => DEFAULT_ASSET_PATH_RUNTIME,
 					_ => throw new ArgumentException()
 				};
 				settings = ScriptableObject.CreateInstance<T>();
@@ -54,7 +57,7 @@ namespace AudioTag.Editors {
 		}
 
 		private static SerializedObject GetSerializedSettings<T>() where T : _AudioProjectSettings
-			=> new SerializedObject(GetOrCreateSettings<T>());
+			=> new(GetOrCreateSettings<T>());
 
 		private static T LoadExistingSettings<T>() where T : _AudioProjectSettings {
 			string[] guids = AssetDatabase.FindAssets($"t:{typeof(T)}");

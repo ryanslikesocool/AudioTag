@@ -1,92 +1,87 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
 using System;
-using System.Linq;
-using UnityEditor;
-using UnityEngine;
-using Foundation.Editors;
 using System.Collections.Generic;
-using Sirenix.Utilities;
-using Foundation;
+using System.Linq;
+using Foundation.Editor;
+using UnityEditor;
+using UnityEditorInternal;
+using UnityEngine;
 
 namespace AudioTag.Editors {
+	//[CustomPropertyDrawer(typeof(List<AudioCommandDescriptor>))] // these don't work for whatever reason
+	//[CustomPropertyDrawer(typeof(AudioCommandDescriptor[]))]
+
 	[CustomPropertyDrawer(typeof(AudioCommandDescriptorList))]
 	internal sealed class AudioCommandDescriptorListPropertyDrawer : PropertyDrawer {
-		public bool useFoldout = true;
-
-		//public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-		//	//return 1000;
-		//}
+		private ReorderableList list;
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-			UnityEngine.Object rootObject = property.serializedObject.targetObject;
-			OnGUI(position, rootObject, property, label);
-		}
+			using EditorGUI.PropertyScope scope = new(position, label, property);
 
-		public void OnGUI(Rect position, UnityEngine.Object rootObject, SerializedProperty property, GUIContent label) {
-			using (var scope = new EditorGUI.PropertyScope(position, label, property)) {
-				label = scope.content;
-				SerializedProperty backing = property.FindPropertyRelative("backing");
-
-				using (new EditorGUI.IndentLevelScope(-EditorGUI.indentLevel)) {
-					//if (useFoldout) {
-					//	property.isExpanded = EditorGUILayout.Foldout(property.isExpanded, GUIContent.none);
-					//	if (property.isExpanded) {
-					//		OnListGUI(rootObject, property, backing);
-					//	}
-					//} else {
-					OnListGUI(rootObject, property, backing);
-					//}
-				}
-			}
+			SerializedProperty backing = property.FindPropertyRelative(nameof(AudioCommandDescriptorList.backing));
+			OnListGUI(property.serializedObject, backing, label);
 		}
 
 		// MARK: - GUI
 
-		private void OnListGUI(UnityEngine.Object rootObject, SerializedProperty property, SerializedProperty backing) {
-			using (new FoundationEditorGUI.BoxGroupScope(property.displayName)) {
-				if (backing.hasMultipleDifferentValues) {
-					EditorGUILayout.HelpBox(Style.MultipleValues, MessageType.Warning);
-				} else {
-					for (int i = 0; i < backing.arraySize; i++) {
-						using (new EditorGUILayout.HorizontalScope()) {
-							UnityEngine.Object commandObject = backing.GetArrayElementAtIndex(i).objectReferenceValue;
+		private void OnListGUI(SerializedObject serializedObject, SerializedProperty backing, GUIContent label) {
+			list ??= new(
+				serializedObject,
+				backing,
+				draggable: true,
+				displayHeader: true,
+				displayAddButton: true,
+				displayRemoveButton: true
+			);
 
-							using (new EditorGUILayout.VerticalScope()) {
-								Editor.CreateEditor(commandObject)
-									.DrawDefaultInspector();
-							}
+			list.drawElementCallback = OnListElementGUI;
+			list.drawHeaderCallback = OnListHeaderGUI;
+			list.elementHeightCallback = OnListElementHeight;
+			list.onDeleteArrayElementCallback = OnDeleteListElement;
+			list.onAddDropdownCallback = OnAddDropdown;
 
-							if (GUILayout.Button(Style.MinusIcon, Style.MinusButtonLayout)) {
-								SubObjectUtility.DestroySubObject(commandObject);
-								backing.DeleteArrayElementAtIndex(i);
-								continue;
-							}
-						}
+			list.DoLayoutList();
 
-						FoundationEditorGUI.HorizontalLine();
-					}
+			void OnListElementGUI(Rect rect, int index, bool isActive, bool isFocused) {
+				SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
+				SerializedObject obj = new(element.objectReferenceValue);
 
-					using (new EditorGUILayout.HorizontalScope()) {
-						EditorGUILayout.Space(0, true);
-						if (EditorGUILayout.DropdownButton(Style.PlusIcon, FocusType.Keyboard, Style.PlusButtonLayout)) {
-							CreateNewCommandMenu(OnSelectNewCommandMenuItem).ShowAsContext();
-						}
-					}
+				DoDrawDefaultInspector(obj, rect);
+			}
+
+			void OnListHeaderGUI(Rect rect) {
+				EditorGUI.LabelField(rect, label);
+			}
+
+			float OnListElementHeight(int index) {
+				SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
+				SerializedObject obj = new(element.objectReferenceValue);
+
+				return GetElementHeight(obj);
+			}
+
+			void OnAddDropdown(Rect buttonRect, ReorderableList list) {
+				CreateNewCommandMenu(OnSelectNewCommandMenuItem).ShowAsContext();
+
+				void OnSelectNewCommandMenuItem(object value) {
+					backing.arraySize += 1;
+
+					backing.GetArrayElementAtIndex(backing.arraySize - 1).objectReferenceValue
+						= SubObjectUtility.CreateSubObject(serializedObject.targetObject, (Type)value, value.ToString());
+
+					backing.serializedObject.ApplyModifiedProperties();
 				}
 			}
 
-			void OnSelectNewCommandMenuItem(object value) {
-				backing.arraySize += 1;
+			void OnDeleteListElement(ReorderableList list, int index) {
+				SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
+				UnityEngine.Object elementObject = element.objectReferenceValue;
 
-				backing.GetArrayElementAtIndex(backing.arraySize - 1).objectReferenceValue
-					= SubObjectUtility.CreateSubObject(rootObject, (Type)value, value.ToString());
-
-				backing.serializedObject.ApplyModifiedProperties();
+				SubObjectUtility.DestroySubObject(elementObject);
+				backing.DeleteArrayElementAtIndex(index);
 			}
 		}
-
-		// MARK: - Utility
 
 		private static GenericMenu CreateNewCommandMenu(GenericMenu.MenuFunction2 func) {
 			Dictionary<string, int> orders = new Dictionary<string, int>();
@@ -114,35 +109,47 @@ namespace AudioTag.Editors {
 		private static IEnumerable<(Type, AudioCommandDescriptorAttribute)> GetCommandTypes()
 			=> TypeCache.GetTypesWithAttribute<AudioCommandDescriptorAttribute>()
 				.Select(type => {
-					AudioCommandDescriptorAttribute attribute = type.GetAttributes<AudioCommandDescriptorAttribute>(inherit: false).First();
+					AudioCommandDescriptorAttribute attribute = type.GetCustomAttributes(typeof(AudioCommandDescriptorAttribute), inherit: false).Cast<AudioCommandDescriptorAttribute>().First();
 					return (type, attribute);
 				})
 				.OrderBy(pair => pair.attribute.order);
 
+		private static float GetElementHeight(SerializedObject obj) {
+			float result = 0;
+
+			SerializedProperty iterator = obj.GetIterator();
+			bool enterChildren = true;
+			while (iterator.NextVisible(enterChildren)) {
+				result += EditorGUI.GetPropertyHeight(iterator, true);
+				enterChildren = false;
+			}
+
+			return result;
+		}
+
+		// based on `bool UnityEditor.Editor.DoDrawDefaultInspector(SerializedObject) { }`
+		private static bool DoDrawDefaultInspector(SerializedObject obj, Rect rect) {
+			rect.height = EditorGUIUtility.singleLineHeight;
+
+			EditorGUI.BeginChangeCheck();
+			obj.UpdateIfRequiredOrScript();
+			SerializedProperty iterator = obj.GetIterator();
+			bool enterChildren = true;
+			while (iterator.NextVisible(enterChildren)) {
+				using (new EditorGUI.DisabledScope("m_Script" == iterator.propertyPath)) {
+					EditorGUI.PropertyField(rect, iterator, true);
+				}
+				rect.y += EditorGUIUtility.singleLineHeight;
+
+				enterChildren = false;
+			}
+
+			obj.ApplyModifiedProperties();
+			return EditorGUI.EndChangeCheck();
+		}
+
 		// MARK: - Constants
 
 		private const char MENU_SEPARATOR = '/';
-
-		private static class Style {
-			internal static readonly GUIContent MinusIcon = new GUIContent(EditorGUIUtility.IconContent(Icon.MINUS));
-			internal static readonly GUIContent PlusIcon = new GUIContent(EditorGUIUtility.IconContent(Icon.PLUS));
-
-			internal const string MultipleValues = "Cannot display command lists with different values.";
-
-			internal static readonly GUILayoutOption[] MinusButtonLayout = new GUILayoutOption[2] {
-				GUILayout.Width(30),
-				GUILayout.Height(18)
-			};
-
-			internal static readonly GUILayoutOption[] PlusButtonLayout = new GUILayoutOption[2] {
-				GUILayout.Width(40),
-				GUILayout.Height(18)
-			};
-
-			internal static class Icon {
-				internal const string MINUS = "Toolbar Minus";
-				internal const string PLUS = "Toolbar Plus";
-			}
-		}
 	}
 }

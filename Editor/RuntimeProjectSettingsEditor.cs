@@ -1,6 +1,6 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
-using Foundation.Editors;
+using Foundation.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,7 +18,7 @@ namespace AudioTag.Editors {
 		// MARK: - Lifecycle
 
 		private void OnEnable() {
-			resetCommandBufferDrawer = new AudioCommandDescriptorListPropertyDrawer { useFoldout = false };
+			resetCommandBufferDrawer = new();
 
 			resetCommandBuffer = serializedObject.FindProperty(Property.resetCommandBuffer);
 
@@ -41,7 +41,7 @@ namespace AudioTag.Editors {
 
 		private void OnResetCommandBufferGUI() {
 			Rect resetCommandBufferDrawerRect = EditorGUILayout.GetControlRect(false, resetCommandBufferDrawer.GetPropertyHeight(resetCommandBuffer, Styles.ResetCommandBuffer));
-			resetCommandBufferDrawer.OnGUI(resetCommandBufferDrawerRect, target, resetCommandBuffer, Styles.ResetCommandBuffer);
+			resetCommandBufferDrawer.OnGUI(resetCommandBufferDrawerRect, resetCommandBuffer, Styles.ResetCommandBuffer);
 		}
 
 		private void OnPoolGUI() {

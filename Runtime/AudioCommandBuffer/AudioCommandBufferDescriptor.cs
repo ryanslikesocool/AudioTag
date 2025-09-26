@@ -1,7 +1,7 @@
 // Developed With Love by Ryan Boyer https://ryanjboyer.com <3
 
-using UnityEngine;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using static System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace AudioTag {

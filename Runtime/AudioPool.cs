@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Foundation;
 using UnityEngine;
 using UnityEngine.Pool;
-using System.Runtime.CompilerServices;
 using static System.Runtime.CompilerServices.MethodImplOptions;
 
 namespace AudioTag {
@@ -63,7 +63,9 @@ namespace AudioTag {
 		}
 
 		private void OnPoolDestroy(AudioSource instance) {
-			instance.gameObject.DestroySafe();
+			if (instance != null) {
+				instance.gameObject.DestroySafe();
+			}
 		}
 
 		// MARK: - Access
