@@ -39,7 +39,7 @@ namespace AudioTag.Editors {
 			const string DEFAULT_ASSET_PATH_EDITOR = "Assets/Plugins/Developed With Love/AudioTag/Editor/Audio Project Settings.asset";
 			const string DEFAULT_ASSET_PATH_RUNTIME = "Assets/Plugins/Developed With Love/AudioTag/Runtime/Audio Project Settings.asset";
 
-			T settings = LoadExistingSettings<T>();
+			T settings = FindExistingSettings<T>();
 			if (settings == null) {
 				string defaultSettingsPath = typeof(T) switch {
 					Type editorType when editorType == typeof(EditorProjectSettings) => DEFAULT_ASSET_PATH_EDITOR,
@@ -59,7 +59,7 @@ namespace AudioTag.Editors {
 		private static SerializedObject GetSerializedSettings<T>() where T : _AudioProjectSettings
 			=> new(GetOrCreateSettings<T>());
 
-		private static T LoadExistingSettings<T>() where T : _AudioProjectSettings {
+		private static T FindExistingSettings<T>() where T : _AudioProjectSettings {
 			string[] guids = AssetDatabase.FindAssets($"t:{typeof(T)}");
 			if (guids.Length == 0) {
 				return null;

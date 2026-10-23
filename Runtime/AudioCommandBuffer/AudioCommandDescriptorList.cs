@@ -11,7 +11,7 @@ namespace AudioTag {
 		// MARK: -
 
 		public IEnumerable<IAudioCommand> Resolve()
-			=> backing.Select(command => command.Resolve());
+			=> backing?.Select(command => command.Resolve());
 
 		// MARK: - Collection Access
 

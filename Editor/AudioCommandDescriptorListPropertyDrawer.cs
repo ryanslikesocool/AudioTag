@@ -38,8 +38,13 @@ namespace AudioTag.Editors {
 			list.drawElementCallback = OnListElementGUI;
 			list.drawHeaderCallback = OnListHeaderGUI;
 			list.elementHeightCallback = OnListElementHeight;
-			list.onDeleteArrayElementCallback = OnDeleteListElement;
 			list.onAddDropdownCallback = OnAddDropdown;
+
+#if UNITY_6000_0_OR_NEWER
+			list.onDeleteArrayElementCallback = OnDeleteListElement;
+#else
+			list.onRemoveCallback = OnRemove;
+#endif
 
 			list.DoLayoutList();
 
@@ -81,6 +86,14 @@ namespace AudioTag.Editors {
 				SubObjectUtility.DestroySubObject(elementObject);
 				backing.DeleteArrayElementAtIndex(index);
 			}
+
+#if !UNITY_6000_0_OR_NEWER
+			void OnRemove(ReorderableList list) {
+				foreach (int index in list.selectedIndices.OrderByDescending(i => i)) {
+					OnDeleteListElement(list, index);
+				}
+			}
+#endif
 		}
 
 		private static GenericMenu CreateNewCommandMenu(GenericMenu.MenuFunction2 func) {
